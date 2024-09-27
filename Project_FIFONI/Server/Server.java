@@ -15,22 +15,29 @@ public class Server {
 
             // Attendere una connessione da parte di un client
             Socket s = server.accept();
-            System.out.println("Connessione accettata da: " + s.getInetAddress());
+            System.out.println("Connessione accettata da " + s.getInetAddress());
 
-            // Usare try-with-resources per garantire che le risorse siano chiuse automaticamente
+            // Usa try-with-resources per garantire che le risorse siano chiuse automaticamente
             try (Scanner from = new Scanner(s.getInputStream());
                  PrintWriter to = new PrintWriter(s.getOutputStream(), true)) {
 
                 // Inviare una richiesta al client
-                to.println("some request");
+                to.println("connessione accettata");
 
-                // Ricevere una risposta dal client
-                String response = from.nextLine();
-                System.out.println("Ricevuto dal client: " + response);
 
-                // Inviare nuovamente la risposta al client (echo)
-                to.println(response);
-
+                // IDEA STRUTTURA:
+                String response = "";
+                do {
+                    // Ascolta i comandi del client
+                    response = from.nextLine();
+                    System.out.println("Ricevuto dal client: " + response);
+                    
+                    // echo
+                    to.println(response);
+                } while(!response.equals("quit"));
+                
+                System.out.println("Server arrestato");
+                
             } catch (IOException e) {
                 System.err.println("Errore durante la comunicazione con il client");
                 e.printStackTrace();
@@ -45,4 +52,3 @@ public class Server {
         }
     }
 }
-

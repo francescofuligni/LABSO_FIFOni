@@ -1,72 +1,49 @@
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.Scanner;
 
 public class Server {
-
     public static void main(String[] args) {
+        if (args.length < 1) {
+            System.err.println("Usage: java Server <port>");
+            return;
+        }
 
-        if (args.length != 1) {
-            System.err.println("Errore di sintassi: utilizzare java Server <porta>");
-        } else {
+        int port = Integer.parseInt(args[0]);
+        Scanner userInput = new Scanner(System.in);
+
+        try {
+            ServerSocket server = new ServerSocket(port);
+            /*
+             * deleghiamo a un altro thread la gestione di tutte le connessioni; nel thread
+             * principale ascoltiamo solo l'input da tastiera dell'utente (in caso voglia
+             * chiudere il programma)
+             */
+            Thread serverThread = new Thread(new SocketListener(server));
+            serverThread.start();
+
+            String command = "";
+
+            while (!command.equals("quit")) {
+                command = userInput.nextLine();
+            }
 
             try {
-                // Parsing dell'argomento in intero
-                final int port = Integer.parseInt(args[0]);
-
-                if (port <= 1024) {
-                    System.err.println("Errore: la porta deve essere maggiore di 1024.");
-                    System.exit(1);
-                }
-
-                // Dichiarazione del ServerSocket
-                try (ServerSocket server = new ServerSocket(port)) {
-                    System.out.println("Server in ascolto sulla porta " + port);
-
-                    // Attendere una connessione da parte di un client
-                    Socket s = server.accept();
-                    System.out.println("Connessione accettata da " + s.getInetAddress());
-
-                    // Usa try-with-resources per garantire che le risorse siano chiuse
-                    // automaticamente
-                    try (Scanner from = new Scanner(s.getInputStream());
-                            PrintWriter to = new PrintWriter(s.getOutputStream(), true)) {
-
-                        // Inviare una richiesta al client
-                        to.println("connessione accettata");
-
-                        // IDEA STRUTTURA:
-                        String response = "";
-                        do {
-                            // Ascolta i comandi del client
-                            response = from.nextLine();
-                            System.out.println("Ricevuto dal client: " + response);
-
-                            // echo
-                            to.println(response);
-                        } while (!response.equals("quit"));
-
-                        System.out.println("Server arrestato");
-
-                    } catch (IOException e) {
-                        System.err.println("Errore durante la comunicazione con il client");
-                        e.printStackTrace();
-                    }
-
-                    // Chiudere il socket
-                    s.close();
-
-                } catch (IOException e) {
-                    System.err.println("Errore durante la creazione del server socket sulla porta " + port);
-                    e.printStackTrace();
-                }
-
-            } catch (NumberFormatException e) {
-                System.err.println("Errore: la porta deve essere un numero intero.");
-                e.printStackTrace();
+                serverThread.interrupt();
+                /* attendi la terminazione del thread */
+                serverThread.join();
+            } catch (InterruptedException e) {
+                /*
+                 * se qualcuno interrompe questo thread nel frattempo, terminiamo
+                 */
+                return;
             }
+            System.out.println("Main thread terminated.");
+        } catch (IOException e) {
+            System.err.println("IOException caught: " + e);
+            e.printStackTrace();
+        } finally {
+            userInput.close();
         }
     }
 }

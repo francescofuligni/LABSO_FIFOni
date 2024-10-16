@@ -1,92 +1,49 @@
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class Client {
-
     public static void main(String[] args) {
-
-
-        if (args.length != 2) {
-            System.err.println("Errore di sintassi: utilizzare java Client <indirizzo> <porta>");
+        if (args.length < 2) {
+            System.err.println("Usage: java Client <host> <port>");
+            return;
         }
-        else{
 
-            final String serverAddress = args[0];   // Indirizzo del server (es. localhost o IP)
-            final int serverPort;
-    
+        String host = args[0];
+        int port = Integer.parseInt(args[1]);
+
+        try {
+            Socket s = new Socket(host, port);
+            System.out.println("Connected to server");
+
+            System.out.println("Usage: info <key> to get info on a key");
+
+            /*
+             * Delega la gestione di input/output a due thread separati, uno per inviare
+             * messaggi e uno per leggerli
+             * 
+             */
+            Thread sender = new Thread(new Sender(s));
+            Thread receiver = new Thread(new Receiver(s, sender));
+
+            sender.start();
+            receiver.start();
+
             try {
-                // Parsing della porta del server
-                serverPort = Integer.parseInt(args[1]);
-            
-                try (Socket socket = new Socket(serverAddress, serverPort);
-                    PrintWriter toServer = new PrintWriter(socket.getOutputStream(), true);
-                    Scanner fromServer = new Scanner(socket.getInputStream());
-                    Scanner userInput = new Scanner(System.in)) {
-                    
-                    // Ricevere il primo messaggio dal server
-                    String serverMessage = fromServer.nextLine();
-                    System.out.println("Messaggio dal server: " + serverMessage);
-        
-                    
-        
-        
-                    // Primo comando per registrazione
-                    String message = "";
-                    boolean unknown = true;     // Flag per comandi sconosciuti
-        
-                    // IDEA STRUTTURA:
-                    do {
-                        System.out.print("Inserire comando 'publisher'/'subscriber'/'show'/'quit': ");
-                        message = userInput.nextLine();
-                        
-                        if(message.startsWith("publisher")) {
-                            // Registra il client come publisher sul topic
-                            System.out.println("Registrato correttamente come publisher");
-                            unknown = false;
-                        } else if(message.startsWith("subscriber")) {
-                            // Registra il client come subscriber sul topic
-                            System.out.println("Registrato correttamente come subscriber");
-                            unknown = false;
-                        } else if(message.equals("show")) {
-                            // Mostra la lista di tutti i topic creati dai publisher
-                            System.out.println("Lista dei topic creati: empty");
-                            unknown = false;
-                        } else {
-                            // Riprova: comando sconosciuto
-                            System.out.println("Comando sconoscuto, riprovare");
-                        }
-        
-                    } while(unknown);   // Riprova se il comando è sconosciuto
-        
-        
-                    while(!message.equals("quit")) {    // Finché non decide di terminare la connessione
-                        // Richiede altri comandi
-                        System.out.print("Nuovo comando: ");
-                        message = userInput.nextLine();
-                        toServer.println(message);
-        
-                        // Risposta dal server (echo)
-                        String serverResponse = fromServer.nextLine();
-                        System.out.println("Echo dal server: " + serverResponse);
-                    }
-                    System.out.println("Client arrestato");
-        
-        
-        
-        
-        
-                } catch (IOException e) {
-                    System.err.println("Errore durante la connessione al server");
-                    e.printStackTrace();
-                }
-
-            } catch (NumberFormatException e) {
-                System.err.println("Errore: la porta deve essere un numero intero.");
-                e.printStackTrace();
+                /* rimane in attesa che sender e receiver terminino la loro esecuzione */
+                sender.join();
+                receiver.join();
+                s.close();
+                System.out.println("Socket closed.");
+            } catch (InterruptedException e) {
+                /*
+                 * se qualcuno interrompe questo thread nel frattempo, terminiamo
+                 */
+                return;
             }
+
+        } catch (IOException e) {
+            System.err.println("IOException caught: " + e);
+            e.printStackTrace();
         }
-       
-}
     }
+}

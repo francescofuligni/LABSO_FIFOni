@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class ClientHandler implements Runnable {
@@ -33,8 +32,7 @@ public class ClientHandler implements Runnable {
                             break;
                         case "info":
                             if (parts.length > 1) {
-                                String key = parts[1];
-                                String response = information.getOrDefault(key, "Error!");
+                                String response = "Request recieved correctly: " + parts[1];
                                 to.println(response);
                             } else {
                                 to.println("No key");
@@ -51,6 +49,7 @@ public class ClientHandler implements Runnable {
             }
 
             to.println("quit");
+            from.close();
             s.close();
             System.out.println("Closed");
         } catch (IOException e) {

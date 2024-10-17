@@ -24,6 +24,7 @@ public class Receiver implements Runnable {
                 }
 
             }
+            from.close();
         } catch (IOException e) {
             System.err.println("IOException caught: " + e);
             e.printStackTrace();

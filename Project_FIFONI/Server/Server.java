@@ -1,11 +1,17 @@
+
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Scanner;
 
 public class Server {
+
+    public HashSet<Topic> topics = new HashSet<Topic>();
+
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("Usage: java Server <port>");
+            System.err.println("Utilizzo: java Server <porta>");
             return;
         }
 
@@ -24,8 +30,40 @@ public class Server {
 
             String command = "";
 
-            while (!command.equals("quit")) {
+            while (true) {
+
                 command = userInput.nextLine();
+
+                if (command.equals("quit")) {
+                    break;
+                } else if (command.equals("show")) {
+                    System.out.println("show non ancora implementato");
+                } else if (command.equals("inspect")) {
+                    System.out.println("Inizio sessione interattiva...");
+
+                    while (true) {
+                        command = userInput.nextLine();
+                        if (command.equals("end")) {
+                            break;
+                        } else if (command.equals("listall")) {
+                            System.out.println("listall non ancora implementato");
+                        } else {
+                            if (command.contains("delete")) {
+                                String[] parts = command.split(" ");
+                                if (parts[0].equals("delete")) {
+                                    // TODO
+                                    // IMPLEMENTARE LOGICA PER DELETE MESSAGE
+                                    System.out.println("delete non ancora implementato");
+                                } else {
+                                    System.out.println("Comando non riconosciuto");
+                                }
+                            }
+
+                        }
+                    }
+                } else {
+                    System.out.println("Comando non riconosciuto");
+                }
             }
 
             try {
@@ -38,9 +76,9 @@ public class Server {
                  */
                 return;
             }
-            System.out.println("Main thread terminated.");
+            System.out.println("Thread principale terminato");
         } catch (IOException e) {
-            System.err.println("IOException caught: " + e);
+            System.err.println("IOException catturata: " + e);
             e.printStackTrace();
         } finally {
             userInput.close();

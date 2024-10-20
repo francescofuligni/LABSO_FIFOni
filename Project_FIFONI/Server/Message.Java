@@ -1,4 +1,6 @@
 import java.time.LocalDateTime;
+import java.util.Date;
+
 public class Message{
 
     /*
@@ -9,10 +11,10 @@ public class Message{
 
     public String id;
     public String content;
-    public Date date;
+    public LocalDateTime date;
 
     public Message(String id, String content){
-        this.id = sender;
+        this.id = id;
         this.content = content;
         this.date = null;
     }

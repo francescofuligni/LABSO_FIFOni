@@ -15,10 +15,10 @@ public class SocketListener implements Runnable {
     @Override
     public void run() {
         try {
-            this.server.setSoTimeout(5000);
+            this.server.setSoTimeout(15000);
             while (!Thread.interrupted()) {
                 try {
-                    System.out.println("Waiting for a new client...");
+                    System.out.println("In attesa di connessioni...");
                     /*
                      * Questa istruzione è bloccante, a prescindere da Thread.interrupt(). Occorre
                      * quindi controllare, una volta accettata la connessione, che il server non sia
@@ -30,7 +30,7 @@ public class SocketListener implements Runnable {
                      */
                     Socket s = this.server.accept();
                     if (!Thread.interrupted()) {
-                        System.out.println("Client connected");
+                        System.out.println("Client connesso");
 
                         /* crea un nuovo thread per lo specifico socket */
                         Thread handlerThread = new Thread(new ClientHandler(s));
@@ -45,7 +45,7 @@ public class SocketListener implements Runnable {
                     }
                 } catch (SocketTimeoutException e) {
                     /* in caso di timeout procediamo semplicemente con l'esecuzione */
-                    System.out.println("Timeout, continuing...");
+                    System.out.println("Timeout...");
                     continue;
                 } catch (IOException e) {
                     /*
@@ -57,13 +57,13 @@ public class SocketListener implements Runnable {
             }
             this.server.close();
         } catch (IOException e) {
-            System.err.println("SocketListener: IOException caught: " + e);
+            System.err.println("SocketListener: IOException catturata: " + e);
             e.printStackTrace();
         }
 
-        System.out.println("Interrupting children...");
+        System.out.println("Interrompendo i vari children...");
         for (Thread child : this.children) {
-            System.out.println("Interrupting " + child + "...");
+            System.out.println("Interrompendo " + child + "...");
             /*
              * child.interrupt() non è bloccante; una volta inviato il segnale
              * di interruzione proseguiamo con l'esecuzione, senza aspettare che "child"

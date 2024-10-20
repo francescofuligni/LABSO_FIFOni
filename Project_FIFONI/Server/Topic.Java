@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Topic {
 
     /*
@@ -9,6 +11,7 @@ public class Topic {
      * per tenere traccia di quali messaggi sono di quale client e poi quando occorre stamparli tutti basta
      * ordinarli per Datetime.
      */
+
     private String name;
     private ArrayList<Message> messages = new ArrayList<Message>();
 

@@ -18,13 +18,13 @@ public class ClientHandler implements Runnable {
             Scanner from = new Scanner(s.getInputStream());
             PrintWriter to = new PrintWriter(s.getOutputStream(), true);
 
-            System.out.println("Thread " + Thread.currentThread() + " listening...");
+            System.out.println("Thread " + Thread.currentThread() + " in ascolto...");
 
             boolean closed = false;
             while (!closed) {
                 String request = from.nextLine();
                 if (!Thread.interrupted()) {
-                    System.out.println("Request: " + request);
+                    System.out.println("Richiesta: " + request);
                     String[] parts = request.split(" ");
                     switch (parts[0]) {
                         case "quit":
@@ -32,7 +32,7 @@ public class ClientHandler implements Runnable {
                             break;
                         case "info":
                             if (parts.length > 1) {
-                                String response = "Request recieved correctly: " + parts[1];
+                                String response = "Richiesta ricevuta correttamente: " + parts[1];
                                 to.println(response);
                             } else {
                                 to.println("No key");

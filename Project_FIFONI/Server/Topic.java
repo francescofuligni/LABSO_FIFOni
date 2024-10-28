@@ -12,7 +12,7 @@ public class Topic {
      * ordinarli per Datetime.
      */
 
-    private String name;
+    public String name;
     private ArrayList<Message> messages = new ArrayList<Message>();
 
     public Topic(String name) {
@@ -29,8 +29,4 @@ public class Topic {
     public ArrayList<Message> getMessages() {
         return this.messages;
     }
-    
-    
-
-
 }

@@ -6,22 +6,20 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.List; 
 import java.util.ArrayList; 
-import java.util.Map; 
 
 public class ClientHandler implements Runnable {
 
     private enum Role {
-        PUBLISHER, SUBSCRIBER, UNSPECIFIED
+        PUBLISHER, SUBSCRIBER, UNDEFINED
     }
 
     private Socket socket;
     private String currentTopic;
     private String clientId;
-    private Role role = Role.UNSPECIFIED; // Ruolo inizialmente non specificato
+    private Role role = Role.UNDEFINED;     // Ruolo inizialmente non specificato
 
     // Mappa che associa topic a una lista di messaggi
     private static HashMap<String, HashMap<String, List<Message>>> topics = new HashMap<>();
-
     private static HashSet<String> availableTopics = new HashSet<>(); // Contiene i nomi dei topic disponibili
 
     // Lista di client handler attivi
@@ -41,7 +39,7 @@ public class ClientHandler implements Runnable {
             Scanner fromClient = new Scanner(socket.getInputStream());
             PrintWriter toClient = new PrintWriter(socket.getOutputStream(), true);
 
-            System.out.println("Thread " + Thread.currentThread() + " in ascolto...");
+            System.out.println("Thread " + Thread.currentThread() + " listening...");
 
             boolean closed = false;
             while (!closed) {
@@ -63,7 +61,7 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "publish":
-                            if (role == Role.UNSPECIFIED) {
+                            if (role == Role.UNDEFINED) {
                                 if (parts.length > 1) {
                                     currentTopic = parts[1];
                                     role = Role.PUBLISHER;
@@ -79,7 +77,7 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "subscribe":
-                            if (role == Role.UNSPECIFIED) {
+                            if (role == Role.UNDEFINED) {
                                 if (parts.length > 1) {
                                     currentTopic = parts[1];
                                     role = Role.SUBSCRIBER;

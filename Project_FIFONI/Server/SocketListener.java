@@ -2,11 +2,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class SocketListener implements Runnable {
     ServerSocket server;
-    ArrayList<Thread> children = new ArrayList<>();
+    LinkedList<Thread> children = new LinkedList<>();
 
     public SocketListener(ServerSocket server) {
         this.server = server;
@@ -15,10 +15,12 @@ public class SocketListener implements Runnable {
     @Override
     public void run() {
         try {
-            this.server.setSoTimeout(15000);
+            System.out.println("In attesa di connessioni...");
+            this.server.setSoTimeout(5000);
             while (!Thread.interrupted()) {
                 try {
-                    System.out.println("In attesa di connessioni...");
+                    
+
                     /*
                      * Questa istruzione è bloccante, a prescindere da Thread.interrupt(). Occorre
                      * quindi controllare, una volta accettata la connessione, che il server non sia
@@ -45,7 +47,7 @@ public class SocketListener implements Runnable {
                     }
                 } catch (SocketTimeoutException e) {
                     /* in caso di timeout procediamo semplicemente con l'esecuzione */
-                    System.out.println("Timeout...");
+                    //System.out.println("Timeout...");
                     continue;
                 } catch (IOException e) {
                     /*

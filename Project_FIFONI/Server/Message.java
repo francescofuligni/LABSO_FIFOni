@@ -25,8 +25,8 @@ public class Message{
 
     @Override
     public String toString() {
-        return  "ID:'" + id + "\n" +
-                "Testo:' " + content + "\n" +
-                "Data:" + date;
+        return  "\n - ID:'" + id + "\n" +
+                "   Testo:' " + content + "\n" +
+                "   Data:" + date + "\n" ;
     }
 }

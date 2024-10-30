@@ -4,9 +4,39 @@ import java.net.ServerSocket;
 import java.util.HashSet;
 import java.util.Scanner;
 
+/*RIMUOVERE ECHO SUL SERVERS SOCKET */
+
 public class Server {
 
     public HashSet<Topic> topics = new HashSet<Topic>();
+
+    private static void startInteractiveSession(Scanner userInput) {
+        System.out.println("Inizio sessione interattiva...");
+
+        while (true) {
+            String command = userInput.nextLine();
+            if (command.equals("end")) {
+                break;
+            } 
+            else if (command.equals("listall")) {
+                System.out.println("listall non ancora implementato");
+            } 
+            else {
+                if (command.contains("delete")) {
+                    String[] parts = command.split(" ");
+                    if (parts[0].equals("delete")) {
+                        // TODO
+                        // IMPLEMENTARE LOGICA PER DELETE MESSAGE
+                        System.out.println("delete non ancora implementato");
+                    } 
+                    else {
+                        System.out.println("Comando non riconosciuto");
+                    }
+                }
+
+            }
+        }
+    }
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -35,31 +65,16 @@ public class Server {
 
                 if (command.equals("quit")) {
                     break;
-                } else if (command.equals("show")) {
-                    System.out.println("show non ancora implementato");
-                } else if (command.equals("inspect")) {
-                    System.out.println("Inizio sessione interattiva...");
+                }
 
-                    while (true) {
-                        command = userInput.nextLine();
-                        if (command.equals("end")) {
-                            break;
-                        } else if (command.equals("listall")) {
-                            System.out.println("listall non ancora implementato");
-                        } else {
-                            if (command.contains("delete")) {
-                                String[] parts = command.split(" ");
-                                if (parts[0].equals("delete")) {
-                                    // TODO
-                                    // IMPLEMENTARE LOGICA PER DELETE MESSAGE
-                                    System.out.println("delete non ancora implementato");
-                                } else {
-                                    System.out.println("Comando non riconosciuto");
-                                }
-                            }
+                else if (command.equals("show")) {
 
-                        }
-                    }
+                    
+                }
+
+                else if (command.equals("inspect")) {
+                    startInteractiveSession(userInput);
+
                 } else {
                     System.out.println("Comando non riconosciuto");
                 }

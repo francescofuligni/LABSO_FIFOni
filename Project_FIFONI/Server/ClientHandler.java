@@ -3,6 +3,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.List; 
 import java.util.ArrayList; 
@@ -19,8 +20,15 @@ public class ClientHandler implements Runnable {
     private Role role = Role.UNDEFINED;     // Ruolo inizialmente non specificato
 
     // Mappa che associa topic a una lista di messaggi
-    private static HashMap<String, HashMap<String, List<Message>>> topics = new HashMap<>();
-    private static HashSet<String> availableTopics = new HashSet<>(); // Contiene i nomi dei topic disponibili
+    //private static HashMap<String, HashMap<String, List<Message>>> topics = new HashMap<>();
+    //private static HashSet<String> availableTopics = new HashSet<>(); // Contiene i nomi dei topic disponibili
+
+
+    // Associo ogni topic al suo nome
+    private static HashMap<String,Topic> topics = new HashMap<>();
+
+
+
 
     // Lista di client handler attivi
     private static final HashSet<ClientHandler> clients = new HashSet<>();
@@ -42,22 +50,28 @@ public class ClientHandler implements Runnable {
             System.out.println("Thread " + Thread.currentThread() + " listening...");
 
             boolean closed = false;
+
             while (!closed) {
-                String request = fromClient.nextLine();
+                String request = fromClient.nextLine().trim();
+
                 if (!Thread.interrupted()) {
                     System.out.println("Richiesta: " + request);
+
                     String[] parts = request.split(" ");
                     switch (parts[0]) {
+
                         case "quit":
                             closed = true;
                             toClient.println("Connessione chiusa.");
                             break;
-
+                        // Visualizza tutti i topic DA CHIEDERE !!!! 
+                        // SE SI VUOLE FARLI CREARE SOLO DA PUBLISHER O DA TUTTI I CLIENT
                         case "show":
-                            toClient.println("Topics:");
-                            for (String topic : availableTopics) {
-                                toClient.println("- " + topic);
-                            }
+                            String show="Topics: ";
+                             for(String t: topics.keySet())
+                                show +=( "\n  - "+ t);
+                                
+                             toClient.println(show);
                             break;
 
                         case "publish":
@@ -65,8 +79,7 @@ public class ClientHandler implements Runnable {
                                 if (parts.length > 1) {
                                     currentTopic = parts[1];
                                     role = Role.PUBLISHER;
-                                    availableTopics.add(currentTopic);
-                                    topics.putIfAbsent(currentTopic, new HashMap<>());
+                                    topics.putIfAbsent(currentTopic, new Topic(currentTopic));
                                     toClient.println("Registrato come publisher su: " + currentTopic);
                                 } else {
                                     toClient.println("Errore: nessun topic specificato.");
@@ -81,8 +94,7 @@ public class ClientHandler implements Runnable {
                                 if (parts.length > 1) {
                                     currentTopic = parts[1];
                                     role = Role.SUBSCRIBER;
-                                    availableTopics.add(currentTopic);
-                                    topics.putIfAbsent(currentTopic, new HashMap<>());
+                                    topics.putIfAbsent(currentTopic, new Topic(currentTopic));
                                     toClient.println("Iscritto al topic: " + currentTopic);
                                 } else {
                                     toClient.println("Errore: nessun topic specificato.");
@@ -94,11 +106,15 @@ public class ClientHandler implements Runnable {
 
                         case "send":
                             if (role == Role.PUBLISHER && parts.length > 1) {
-                                String messageContent = request.substring(5);  // Rimuove 'send ' dal messaggio
-                                Message message = new Message(clientId, messageContent);
-                                message.setReceivingTime(); // Imposta la data di ricezione
-                                topics.get(currentTopic).computeIfAbsent(clientId, k -> new ArrayList<>()).add(message);
+                                String messageContent = request.substring(5).trim();  // Rimuove 'send ' dal messaggio
 
+                                Message message = new Message( "CODICE DA INSERIRE", messageContent);
+
+                                ///////////
+                                message.setReceivingTime(); // Imposta la data di ricezione
+                                ////////////
+
+                                topics.get(currentTopic).publishMessage(clientId, message);
                                 
                                 // Notifica i subscriber
                                 notifySubscribers(currentTopic, message);
@@ -113,12 +129,12 @@ public class ClientHandler implements Runnable {
 
                             case "list":
                             if (role == Role.PUBLISHER && currentTopic != null) {
-                                List<Message> messages = topics.get(currentTopic).get(clientId);
-                                if (messages != null && !messages.isEmpty()) {
-                                    toClient.println("Messaggi inviati dal client " + clientId + " sul topic " + currentTopic + ":");
-                                    for (Message msg : messages) {
-                                        toClient.println(msg.content + " (Data: " + msg.date + ")");
-                                    }
+
+                                String clientMessages = topics.get(currentTopic).formattedClientMessages(clientId);
+                                
+                                if (clientMessages != null && !clientMessages.isEmpty()) {
+                                    toClient.println("Messaggi inviati dal client " + clientId + " sul topic " + currentTopic + ":\n" + clientMessages);
+                                    
                                 } else {
                                     toClient.println("Nessun messaggio inviato dal client " + clientId + " su questo topic.");
                                 }
@@ -130,14 +146,12 @@ public class ClientHandler implements Runnable {
 
                             case "listall":
                             if (currentTopic != null) {
-                            HashMap<String, List<Message>> allMessages = topics.get(currentTopic);
+                            String allMessages = topics.get(currentTopic).formattedAllMessages();
                             if (allMessages == null || allMessages.isEmpty()) {
                                 toClient.println("Nessun messaggio presente sul topic " + currentTopic + ".");
                                 } else {
-                                    toClient.println("Tutti i messaggi sul topic " + currentTopic + ":");
-                                    allMessages.forEach((senderId, messages) -> messages.forEach(msg ->
-                                        toClient.println(senderId + ": " + msg.content + " (Data: " + msg.date + ")")
-                                    ));
+                                    toClient.println("Tutti i messaggi sul topic " + currentTopic + ":\n" + allMessages);
+                                    
                                 }
                             } else {
                                 toClient.println("Errore: nessun topic selezionato.");

@@ -15,10 +15,12 @@ public class Receiver implements Runnable {
     @Override
     public void run() {
         try {
+            //OCCHIO ALLA CONCORRENZA I COMANDI DI STAMPA VENGONO INVIATI SULLA SOCKET 
+            //E LETTI RIGA PER RIGA ANCHE SE SONO UNA STRINGA UNICA
             Scanner from = new Scanner(this.s.getInputStream());
             while (true) {
                 String response = from.nextLine();
-                System.out.println("Received: " + response);
+                System.out.println(response);
                 if (response.equals("quit")) {
                     break;
                 }

@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Sender implements Runnable {
 
-    Socket s;
+    private Socket s;
 
     public Sender(Socket s) {
         this.s = s;
@@ -33,9 +33,9 @@ public class Sender implements Runnable {
                     break;
                 }
             }
-            System.out.println("Sender closed.");
+            System.out.println("Sender terminato.");
         } catch (IOException e) {
-            System.err.println("IOException caught: " + e);
+            System.err.println("SENDER - IOException caught: " + e);
             e.printStackTrace();
         } finally {
             userInput.close();

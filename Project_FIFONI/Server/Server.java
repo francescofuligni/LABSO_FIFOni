@@ -1,42 +1,42 @@
-
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Scanner;
-
-/*RIMUOVERE ECHO SUL SERVERS SOCKET */
 
 public class Server {
 
-    public HashSet<Topic> topics = new HashSet<Topic>();
+    // TODO: Map contenente tutti i topic (visibile a tutte le classi) -> classe TopicsHandler ??
+    //public HashMap<String,Topic> allTopics = new HashMap<>();
 
-    private static void startInteractiveSession(Scanner userInput) {
-        System.out.println("Inizio sessione interattiva...");
+    private static void interactiveSession(Scanner input, String topicName) {
+        System.out.println("Inizio sessione interattiva...\nComandi sessione interattiva:\n  > listall\n  > delete <id>\n  > end");
 
-        while (true) {
-            String command = userInput.nextLine();
-            if (command.equals("end")) {
-                break;
-            } 
-            else if (command.equals("listall")) {
-                System.out.println("listall non ancora implementato");
-            } 
-            else {
-                if (command.contains("delete")) {
-                    String[] parts = command.split(" ");
-                    if (parts[0].equals("delete")) {
-                        // TODO
-                        // IMPLEMENTARE LOGICA PER DELETE MESSAGE
-                        System.out.println("delete non ancora implementato");
-                    } 
-                    else {
-                        System.out.println("Comando non riconosciuto");
-                    }
-                }
+        boolean closed = false;
+        while (!closed) {
+            String command = input.nextLine().trim();
+            String[] parts = command.split(" ", 2);
 
+            switch (parts[0]) {
+
+                case "listall":
+                    System.out.println("*LISTALL NON IMPLEMENTATO*");
+                    // TODO stampa tutti i messaggi sul topic selezionato
+                
+                case "delete":
+                    System.out.println("*DELETE NON IMPLEMENTATO*");
+                    //  if( Topic.deleteMessage() ) -> OK, else -> ERRORE
+                
+                case "end":
+                    closed = true;
+                    break;
+
+                default:
+                    System.out.println("Comando <" + command + "> sconosciuto."); 
+                    break;
             }
         }
     }
+
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -45,7 +45,7 @@ public class Server {
         }
 
         int port = Integer.parseInt(args[0]);
-        Scanner userInput = new Scanner(System.in);
+        Scanner input = new Scanner(System.in);
 
         try {
             ServerSocket server = new ServerSocket(port);
@@ -56,33 +56,38 @@ public class Server {
              */
             Thread serverThread = new Thread(new SocketListener(server));
             serverThread.start();
-
             String command = "";
+            System.out.println("Comandi server:\n  > show\n  > inspect <topic>\n  > quit");
 
-            while (true) {
+            boolean closed = false;
+            while (!closed) {
+                command = input.nextLine().trim();
+                String[] parts = command.split(" ", 2);
 
-                command = userInput.nextLine();
+                switch (parts[0]) {
+                    case "quit":
+                        closed = true;
+                        break;
+                
+                    case "show":
+                        System.out.println("*SHOW NON IMPLEMENTATO*");
+                        break;
 
-                if (command.equals("quit")) {
-                    break;
-                }
-
-                else if (command.equals("show")) {
-
-                    
-                }
-
-                else if (command.equals("inspect")) {
-                    startInteractiveSession(userInput);
-
-                } else {
-                    System.out.println("Comando non riconosciuto");
+                    case "inspect":
+                        // TODO CONTROLLO ESISTENZA TOPIC -> classe TopicsHandler ??
+                        interactiveSession(input, parts[1].trim());
+                        break;
+                
+                    default:
+                        System.out.println("Comando <" +  command + "> sconosciuto.");
+                        break;
                 }
             }
 
             try {
                 serverThread.interrupt();
-                /* attendi la terminazione del thread */
+                /* Attendi la terminazione del thread */
+                System.out.println("In attesa della terminazione del thread...");
                 serverThread.join();
             } catch (InterruptedException e) {
                 /*
@@ -90,12 +95,12 @@ public class Server {
                  */
                 return;
             }
-            System.out.println("Thread principale terminato");
+            System.out.println("Thread principale terminato.");
         } catch (IOException e) {
-            System.err.println("IOException catturata: " + e);
+            System.err.println("SERVER - IOException catturata: " + e);
             e.printStackTrace();
         } finally {
-            userInput.close();
+            input.close();
         }
     }
 }

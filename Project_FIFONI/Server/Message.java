@@ -8,25 +8,36 @@ public class Message{
      * Il messaggio ha un id, il suo testo e la data e ora ricezione
      */
 
-    public String id;
-    public String content;
-    public LocalDateTime date;
+    private String id;
+    private String content;
+    private LocalDateTime date;
 
     public Message(String id, String content){
         this.id = id;
         this.content = content;
-        this.date = null;
+        this.date = LocalDateTime.now();
     }
 
-    //va fatto invocare al server quando il messaggio viene ricevuto.
+    /* MESSO NEL COSTRUTTORE !!
+    // Invocato dal server quando il messaggio viene ricevuto (?)
     public void setReceivingTime(){
         this.date = LocalDateTime.now();
+    }
+    */
+
+    public String getID() {
+        return this.id;
+    }
+
+    // Formatta correttamente la data per la stampa
+    private String printDate() {
+        return date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + " " + date.getHour() + ":" + date.getMinute() + ":" + date.getSecond();
     }
 
     @Override
     public String toString() {
-        return  "\n - ID:'" + id + "\n" +
-                "   Testo:' " + content + "\n" +
-                "   Data:" + date + "\n" ;
+        return  "\n  - ID: " + this.id +
+                "\n    Testo: '" + this.content +
+                "'\n    Data: " + printDate();
     }
 }

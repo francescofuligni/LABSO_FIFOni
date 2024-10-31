@@ -5,8 +5,8 @@ import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 
 public class SocketListener implements Runnable {
-    ServerSocket server;
-    LinkedList<Thread> children = new LinkedList<>();
+    private ServerSocket server;
+    private LinkedList<Thread> children = new LinkedList<>();
 
     public SocketListener(ServerSocket server) {
         this.server = server;
@@ -32,7 +32,7 @@ public class SocketListener implements Runnable {
                      */
                     Socket s = this.server.accept();
                     if (!Thread.interrupted()) {
-                        System.out.println("Client connesso");
+                        System.out.println("Client connesso.");
 
                         /* crea un nuovo thread per lo specifico socket */
                         Thread handlerThread = new Thread(new ClientHandler(s));
@@ -59,7 +59,7 @@ public class SocketListener implements Runnable {
             }
             this.server.close();
         } catch (IOException e) {
-            System.err.println("SocketListener: IOException catturata: " + e);
+            System.err.println("SOCKETLISTENER - IOException catturata: " + e);
             e.printStackTrace();
         }
 

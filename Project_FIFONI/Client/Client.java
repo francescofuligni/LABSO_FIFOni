@@ -13,8 +13,8 @@ public class Client {
 
         try {
             Socket s = new Socket(host, port);
-            System.out.println("Connesso al server");
-            System.out.println("Comandi:\n> publish <topic>\n> subscribe <topic>\n> show\n> quit");
+            System.out.println("Connesso al server.");
+            System.out.println("Comandi client:\n  > publish <topic>\n  > subscribe <topic>\n  > show\n  > quit");
 
             /*
              * Delega la gestione di input/output a due thread separati, uno per inviare
@@ -33,7 +33,7 @@ public class Client {
                 sender.join();
                 receiver.join();
                 s.close();
-                System.out.println("Socket chiusa");
+                System.out.println("Socket chiusa.");
             } catch (InterruptedException e) {
                 /*
                  * Se qualcuno interrompe questo thread nel frattempo, terminiamo
@@ -42,7 +42,7 @@ public class Client {
             }
 
         } catch (IOException e) {
-            System.err.println("IOException catturata: " + e);
+            System.err.println("CLIENT - IOException catturata: " + e);
             e.printStackTrace();
         }
     }

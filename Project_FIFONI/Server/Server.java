@@ -18,14 +18,24 @@ public class Server {
 
             switch (parts[0]) {
 
+                // Elenca tutti i messaggi sul topic
                 case "listall":
                     System.out.println("*LISTALL NON IMPLEMENTATO*");
                     // TODO stampa tutti i messaggi sul topic selezionato
+                    break;
                 
+                // Elimina un messaggio su un topic
                 case "delete":
-                    System.out.println("*DELETE NON IMPLEMENTATO*");
-                    //  if( Topic.deleteMessage() ) -> OK, else -> ERRORE
+                    if(parts.length>1) {
+                        // TODO controllo sul formato dell'ID
+                        System.out.println("*DELETE NON IMPLEMENTATO*");
+                        // TODO: if( topic.deleteMessage() ) -> OK, else -> ERRORE
+                    } else {
+                        System.out.println("ERRORE: nessun id selezionato.");
+                    }
+                    break;
                 
+                // Termina la sessione interattiva
                 case "end":
                     closed = true;
                     break;
@@ -35,6 +45,7 @@ public class Server {
                     break;
             }
         }
+        System.out.println("Sessione interattiva terminata.");
     }
 
 
@@ -65,17 +76,25 @@ public class Server {
                 String[] parts = command.split(" ", 2);
 
                 switch (parts[0]) {
+
+                    // Interrompe il server
                     case "quit":
                         closed = true;
                         break;
                 
+                    // Mostra la lista di tutti i topic creati
                     case "show":
                         System.out.println("*SHOW NON IMPLEMENTATO*");
                         break;
 
+                    // Apre una sessione interattiva per analizzare un topic
                     case "inspect":
-                        // TODO CONTROLLO ESISTENZA TOPIC -> classe TopicsHandler ??
-                        interactiveSession(input, parts[1].trim());
+                        if(parts.length>1) {
+                            // TODO CONTROLLO ESISTENZA TOPIC -> classe TopicsHandler ??
+                            interactiveSession(input, parts[1].trim());
+                        } else {
+                            System.out.println("ERRORE: nessun topic selezionato.");
+                        }
                         break;
                 
                     default:

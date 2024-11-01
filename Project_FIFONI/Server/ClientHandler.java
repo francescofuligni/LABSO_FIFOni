@@ -25,9 +25,9 @@ public class ClientHandler implements Runnable {
     private static HashMap<String,Topic> topics = new HashMap<>();
 
 
-    // TODO IMPLEMENTARE CODICE MESSAGGI -> in Server ??
+    // TODO ! IMPLEMENTARE CODICE MESSAGGI -> in Server ??
 
-    // TODO SOLUZIONE TEMPORANEA (DA MODIFICARE) -> in Server ??
+    // TODO ! SOLUZIONE TEMPORANEA (DA MODIFICARE) -> in Server ??
     // Lista di client handler attivi
     private static final HashSet<ClientHandler> clients = new HashSet<>();
 
@@ -37,6 +37,10 @@ public class ClientHandler implements Runnable {
         synchronized (clients) {
             clients.add(this); // Aggiungi il client handler alla lista
         }
+    }
+
+    public Socket getSocket() {
+        return this.socket;
     }
 
     @Override
@@ -116,11 +120,10 @@ public class ClientHandler implements Runnable {
                             if (role == Role.publisher && parts.length>1) {
                                 Message message = new Message("*MESSAGEID NON IMPLEMENTATO*", parts[1].trim());
 
-                                /*
-                                message.setReceivingTime(); // Imposta la data di ricezione
-                                */
+                                // message.setReceivingTime();  // Imposta la data di ricezione
+                                // Inserito nel costruttore di Message
 
-                                topics.get(topicName).publishMessage(clientID, message);
+                                topics.get(topicName).sendMessage(clientID, message);
                                 
                                 // Notifica i subscriber
                                 notifySubscribers(topicName, message);

@@ -18,11 +18,13 @@ public class Server {
 
             switch (parts[0]) {
 
+                // Elenca tutti i messaggi sul topic
                 case "listall":
                     System.out.println("*LISTALL NON IMPLEMENTATO*");
                     // TODO stampa tutti i messaggi sul topic selezionato
                     break;
                 
+                // Elimina un messaggio su un topic
                 case "delete":
                     if(parts.length>1) {
                         // TODO controllo sul formato dell'ID
@@ -33,6 +35,7 @@ public class Server {
                     }
                     break;
                 
+                // Termina la sessione interattiva
                 case "end":
                     closed = true;
                     break;
@@ -73,14 +76,18 @@ public class Server {
                 String[] parts = command.split(" ", 2);
 
                 switch (parts[0]) {
+
+                    // Interrompe il server
                     case "quit":
                         closed = true;
                         break;
                 
+                    // Mostra la lista di tutti i topic creati
                     case "show":
                         System.out.println("*SHOW NON IMPLEMENTATO*");
                         break;
 
+                    // Apre una sessione interattiva per analizzare un topic
                     case "inspect":
                         if(parts.length>1) {
                             // TODO CONTROLLO ESISTENZA TOPIC -> classe TopicsHandler ??

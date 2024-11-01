@@ -9,12 +9,12 @@ public class Message{
      */
 
     private String id;
-    private String content;
+    private String text;
     private LocalDateTime date;
 
-    public Message(String id, String content){
+    public Message(String id, String text){
         this.id = id;
-        this.content = content;
+        this.text = text;
         this.date = LocalDateTime.now();
     }
 
@@ -37,7 +37,7 @@ public class Message{
     @Override
     public String toString() {
         return  "\n  - ID: " + this.id +
-                "\n    Testo: '" + this.content +
+                "\n    Testo: '" + this.text +
                 "'\n    Data: " + printDate();
     }
 }

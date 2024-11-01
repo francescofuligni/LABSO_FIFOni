@@ -21,10 +21,17 @@ public class Server {
                 case "listall":
                     System.out.println("*LISTALL NON IMPLEMENTATO*");
                     // TODO stampa tutti i messaggi sul topic selezionato
+                    break;
                 
                 case "delete":
-                    System.out.println("*DELETE NON IMPLEMENTATO*");
-                    //  if( Topic.deleteMessage() ) -> OK, else -> ERRORE
+                    if(parts.length>1) {
+                        // TODO controllo sul formato dell'ID
+                        System.out.println("*DELETE NON IMPLEMENTATO*");
+                        // TODO: if( topic.deleteMessage() ) -> OK, else -> ERRORE
+                    } else {
+                        System.out.println("ERRORE: nessun id selezionato.");
+                    }
+                    break;
                 
                 case "end":
                     closed = true;
@@ -35,6 +42,7 @@ public class Server {
                     break;
             }
         }
+        System.out.println("Sessione interattiva terminata.");
     }
 
 
@@ -74,8 +82,12 @@ public class Server {
                         break;
 
                     case "inspect":
-                        // TODO CONTROLLO ESISTENZA TOPIC -> classe TopicsHandler ??
-                        interactiveSession(input, parts[1].trim());
+                        if(parts.length>1) {
+                            // TODO CONTROLLO ESISTENZA TOPIC -> classe TopicsHandler ??
+                            interactiveSession(input, parts[1].trim());
+                        } else {
+                            System.out.println("ERRORE: nessun topic selezionato.");
+                        }
                         break;
                 
                     default:

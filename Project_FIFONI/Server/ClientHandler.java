@@ -72,7 +72,7 @@ public class ClientHandler implements Runnable {
                             if(topics.isEmpty()) {
                                 toClient.println("Nessun topic creato.");
                             } else {
-                                String printShow = "Topics: ";
+                                String printShow = "Tutti i topic: ";
                                 for(String t: topics.keySet()) {
                                     printShow += ("\n  - "+ t);
                                 }
@@ -98,7 +98,7 @@ public class ClientHandler implements Runnable {
 
                         case "subscribe":
                             if (role == Role.undefined) {
-                                if (parts.length > 1) {
+                                if (parts.length>1) {
                                     topicName = parts[1].trim();
                                     role = Role.subscriber;
                                     topics.putIfAbsent(topicName, new Topic(topicName));
@@ -108,12 +108,12 @@ public class ClientHandler implements Runnable {
                                     toClient.println("ERRORE: nessun topic specificato.");
                                 }
                             } else {
-                                toClient.println("ERRORE: già registrato come '" + role + "'.");
+                                toClient.println("ERRORE: già registrato come " + role + ".");
                             }
                             break;
 
                         case "send":
-                            if (role == Role.publisher && parts.length > 1) {
+                            if (role == Role.publisher && parts.length>1) {
                                 Message message = new Message("*MESSAGEID NON IMPLEMENTATO*", parts[1].trim());
 
                                 /*
@@ -127,14 +127,14 @@ public class ClientHandler implements Runnable {
                                 
                                 toClient.println("Messaggio inviato correttamente sul topic '" + topicName + "'.");
                             } else if (role != Role.publisher) {
-                                toClient.println("ERRORE: già registrato come '" + role + "'.");
+                                toClient.println("ERRORE: già registrato come " + role + ".");
                             } else {
                                 toClient.println("ERRORE: nessun messaggio specificato.");
                             }
                             break;
 
                         case "list":
-                            if (role == Role.publisher && topicName != null) {
+                            if (role == Role.publisher && topicName!=null) {
                                 String clientMessages = topics.get(topicName).printClientMessages(clientID);
                                 
                                 if (clientMessages != null && !clientMessages.isEmpty()) {

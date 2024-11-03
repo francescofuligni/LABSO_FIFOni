@@ -3,8 +3,7 @@ import java.time.LocalDateTime;
 public class Message{
 
     /*
-     * Rappresentazione di un messaggio.
-     * 
+     * Rappresentazione di un messaggio
      * Il messaggio ha un id, il suo testo e la data e ora ricezione
      */
 
@@ -12,8 +11,8 @@ public class Message{
     private String text;
     private LocalDateTime date;
 
-    public Message(String id, String text){
-        this.id = id;
+    public Message(String text){
+        this.id = "msg_" + System.currentTimeMillis();
         this.text = text;
         this.date = LocalDateTime.now();
     }

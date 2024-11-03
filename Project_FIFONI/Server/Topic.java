@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,14 +26,16 @@ public class Topic {
     }
 
     // metodo che permette a un publisher di aggiungere un messaggio al topic
-    public void sendMessage(String clientID, Message message) {
+    public void sendMessage(String clientID, String text) {
+        Message m = new Message(text);
         if(this.messages.containsKey(clientID)) {
-            this.messages.get(clientID).add(message);
+            this.messages.get(clientID).add(m);
         }
         else{
             this.messages.put(clientID, new LinkedList<>());
-            this.messages.get(clientID).add(message);
+            this.messages.get(clientID).add(m);
         } 
+        notifySubscribers(m);
     }
 
     public void subscribe(ClientHandler c) {
@@ -64,8 +68,11 @@ public class Topic {
 
     public String printClientMessages(String clientID) {
         String formattedMessages = "";
-        for(Message m : this.getClientMessages(clientID)) {
-            formattedMessages += m.toString();
+        List<Message> clientMessages = this.getClientMessages(clientID);
+        if(clientMessages != null) {
+            for(Message m : clientMessages) {
+                formattedMessages += m.toString();
+            }
         }
         return formattedMessages;
     }
@@ -76,14 +83,6 @@ public class Topic {
             formattedMessages += m.toString();
         }
         return formattedMessages;
-    }
-
-    private Message findMessage(String messageID) {
-        for(Message m : this.getAllMessages()) {
-            if(m.getID().equals(messageID))
-                return m;
-        }
-        return null;
     }
 
     public boolean deleteMessage(String messageID) {
@@ -97,6 +96,28 @@ public class Topic {
             }
         }
         return false;
+    }
+
+    private Message findMessage(String messageID) {
+        for(Message m : this.getAllMessages()) {
+            if(m.getID().equals(messageID))
+                return m;
+        }
+        return null;
+    }
+
+    private void notifySubscribers(Message message) {
+        for (ClientHandler c : this.subscribers) {
+
+            // controlli non necessari -> sappiamo che i subscribers nel topic sono corretti perché li aggiungiamo quando si iscrivono
+
+            try {
+                PrintWriter toSubscriber = new PrintWriter(c.getSocket().getOutputStream(), true);
+                toSubscriber.println("Nuovo messaggio sul topic '" + this.name + "': " + message);
+            } catch (IOException e) {
+                System.err.println("TOPIC - Eccezione nell'invio del messaggio al subscriber: " + e);
+            }
+        }
     }
 
     @Override

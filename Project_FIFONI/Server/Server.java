@@ -1,15 +1,13 @@
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class Server {
 
-    // TODO: Map contenente tutti i topic (visibile a tutte le classi) -> classe TopicsHandler ??
-    //public HashMap<String,Topic> allTopics = new HashMap<>();
+    public static TopicsHandler topics = new TopicsHandler();
 
     private static void interactiveSession(Scanner input, String topicName) {
-        System.out.println("Inizio sessione interattiva...\nComandi sessione interattiva:\n  > listall\n  > delete <id>\n  > end");
+        System.out.println("Inizio sessione interattiva...\nComandi sessione interattiva:\n  > :listall\n  > :delete <id>\n  > :end");
 
         boolean closed = false;
         while (!closed) {
@@ -19,13 +17,13 @@ public class Server {
             switch (parts[0]) {
 
                 // Elenca tutti i messaggi sul topic
-                case "listall":
+                case ":listall":
                     System.out.println("*LISTALL NON IMPLEMENTATO*");
                     // TODO stampa tutti i messaggi sul topic selezionato
                     break;
                 
                 // Elimina un messaggio su un topic
-                case "delete":
+                case ":delete":
                     if(parts.length>1) {
                         // TODO controllo sul formato dell'ID
                         System.out.println("*DELETE NON IMPLEMENTATO*");
@@ -36,7 +34,7 @@ public class Server {
                     break;
                 
                 // Termina la sessione interattiva
-                case "end":
+                case ":end":
                     closed = true;
                     break;
 
@@ -106,7 +104,6 @@ public class Server {
             try {
                 serverThread.interrupt();
                 /* Attendi la terminazione del thread */
-                System.out.println("In attesa della terminazione del thread...");
                 serverThread.join();
             } catch (InterruptedException e) {
                 /*

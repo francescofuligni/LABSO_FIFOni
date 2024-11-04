@@ -17,13 +17,6 @@ public class Message{
         this.date = LocalDateTime.now();
     }
 
-    /* MESSO NEL COSTRUTTORE !!
-    // Invocato dal server quando il messaggio viene ricevuto (?)
-    public void setReceivingTime(){
-        this.date = LocalDateTime.now();
-    }
-    */
-
     public String getID() {
         return this.id;
     }
@@ -35,7 +28,7 @@ public class Message{
 
     @Override
     public String toString() {
-        return  "\n  - ID: " + this.id +
+        return  "ID: " + this.id +
                 "\n    Testo: '" + this.text +
                 "'\n    Data: " + printDate();
     }

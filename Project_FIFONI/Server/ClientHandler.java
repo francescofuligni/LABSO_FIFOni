@@ -16,26 +16,9 @@ public class ClientHandler implements Runnable {
     private String clientID;
     private Role role = Role.undefined;     // Ruolo inizialmente non specificato
 
-    // Mappa che associa topic a una lista di messaggi
-    //private static HashMap<String, HashMap<String, List<Message>>> topics = new HashMap<>();
-    //private static HashSet<String> availableTopics = new HashSet<>(); // Contiene i nomi dei topic disponibili
-
-    // Associo ogni topic al suo nome
-    //private static HashMap<String,Topic> topics = new HashMap<>();
-    //private TopicsHandler topics = new TopicsHandler();
-
-    // TODO ! SOLUZIONE TEMPORANEA (DA MODIFICARE) -> TopicsHandler ??
-    // Lista di client handler attivi
-    // private static final HashSet<ClientHandler> clients = new HashSet<>();
-
     public ClientHandler(Socket socket) {
         this.socket = socket;
         this.clientID = "clt_" + System.currentTimeMillis();
-        /*
-        synchronized (clients) {
-            clients.add(this); // Aggiungi il client handler alla lista
-        }
-        */
     }
 
     public Socket getSocket() {
@@ -71,12 +54,7 @@ public class ClientHandler implements Runnable {
                         case "show":
                             // Visualizza tutti i topic -> TODO !!! DA CHIEDERE !!!
                             // SE SI VUOLE FARLI CREARE SOLO DA PUBLISHER O DA TUTTI I CLIENT
-
-                            if(Server.topics.isEmpty()) {
-                                toClient.println("Nessun topic creato.");
-                            } else {
-                                toClient.println(Server.topics.show());
-                            }
+                            toClient.println(Server.topics.show());
                             break;
 
                         case "publish":
@@ -98,7 +76,7 @@ public class ClientHandler implements Runnable {
 
                         case "subscribe":
                             if (role == Role.undefined) {
-                                if (parts.length>1) {
+                                if (parts.length > 1) {
                                     topicName = parts[1].trim();
                                     role = Role.subscriber;
 
@@ -116,12 +94,12 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "send":
-                            if (role == Role.publisher && parts.length>1) {
+                            if (role == Role.publisher && parts.length > 1) {
 
-                                Server.topics.get(topicName).sendMessage(request, parts[1].trim());
+                                Server.topics.get(topicName).sendMessage(clientID, parts[1].trim());
                                 // Notifica i subscriber all'interno del metodo !
-                                
-                                toClient.println("Messaggio inviato correttamente sul topic '" + topicName + "'.");
+                                toClient.println("Messaggio inviato sul topic '" + topicName + "'.");
+
                             } else if (role != Role.publisher) {
                                 toClient.println("ERRORE: già registrato come " + role + ".");
                             } else {
@@ -130,13 +108,8 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "list":
-                            if (role == Role.publisher && topicName!=null) {
-                                String clientMessages = Server.topics.get(topicName).printClientMessages(clientID);
-                                if (clientMessages == "") {
-                                    toClient.println("Nessun messaggio inviato dal client '" + clientID + "' sul topic '" + topicName + "'.");
-                                } else {
-                                    toClient.println("Messaggi inviati dal client '" + clientID + "' sul topic '" + topicName + "':" + clientMessages);
-                                }
+                            if (role == Role.publisher && topicName != null) {
+                                toClient.println(Server.topics.get(topicName).printClientMessages(clientID));
                             } else {
                                 toClient.println("ERRORE: nessun topic selezionato.");
                             }
@@ -144,12 +117,7 @@ public class ClientHandler implements Runnable {
 
                         case "listall":
                             if (topicName != null) {
-                                String allMessages = Server.topics.get(topicName).printAllMessages();
-                                if (allMessages == "") {
-                                    toClient.println("Nessun messaggio creato sul topic '" + topicName + "'.");
-                                } else {
-                                    toClient.println("Tutti i messaggi sul topic '" + topicName + "':" + allMessages);
-                                }
+                                toClient.println(Server.topics.get(topicName).printAllMessages());
                             } else {
                                 toClient.println("Errore: nessun topic selezionato.");
                             }
@@ -171,30 +139,6 @@ public class ClientHandler implements Runnable {
         } catch (IOException e) {
             System.err.println("CLIENTHANDLER - IOException catturata: " + e);
             e.printStackTrace();
-        } 
-        /*finally {
-            synchronized (clients) {
-                clients.remove(this); // Rimuovi il client handler dalla lista
-            }
-        }
-        */
-    }
-
-    // TODO SOLUZIONE TEMPORANEA (DA MODIFICARE)
-    /*
-    private void notifySubscribers(String topic, Message message) {
-        synchronized (clients) {
-            for (ClientHandler handler : clients) {
-                if (handler.role == Role.subscriber && handler.topicName.equals(topic)) {
-                    try {
-                        PrintWriter toSubscriber = new PrintWriter(handler.socket.getOutputStream(), true);
-                        toSubscriber.println("Nuovo messaggio sul topic '" + topic + "': " + message);
-                    } catch (IOException e) {
-                        System.err.println("CLIENTHANDLER - Eccezione nell'invio del messaggio al subscriber: " + e);
-                    }
-                }
-            }
         }
     }
-    */
 }

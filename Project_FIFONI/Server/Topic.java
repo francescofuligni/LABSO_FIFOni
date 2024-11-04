@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,15 +25,52 @@ public class Topic {
         this.subscribers = new HashSet<>();
     }
 
+    
+    // metodo che restituisce TUTTI i messaggi di un client
+    private List<Message> getClientMessages(String clientID) {
+        return this.messages.get(clientID);
+    }
+
+    // metodo che restituisce TUTTI i messaggi sul  topic NON in ORDINE 
+    private List<Message> getAllMessages() {
+        LinkedList<Message> allMessages = new LinkedList<>();
+        for(String key : this.messages.keySet()) {
+            allMessages.addAll(this.messages.get(key));
+        }
+        return allMessages;
+    }
+
+    private Message findMessage(String messageID) {
+        for(Message m : this.getAllMessages()) {
+            if(m.getID().equals(messageID))
+                return m;
+        }
+        return null;
+    }
+
+    private void notifySubscribers(Message message) {
+        for (ClientHandler c : this.subscribers) {
+            try {
+                PrintWriter toSubscriber = new PrintWriter(c.getSocket().getOutputStream(), true);
+                toSubscriber.println("Nuovo messaggio sul topic '" + this.name + "':\n    " + message);
+            } catch (IOException e) {
+                System.err.println("TOPIC - Eccezione nell'invio del messaggio al subscriber: " + e);
+            }
+        }
+    }
+    
+    
     // metodo che permette a un publisher di aggiungere un messaggio al topic
-    public void sendMessage(String clientID, Message message) {
+    public void sendMessage(String clientID, String text) {
+        Message m = new Message(text);
         if(this.messages.containsKey(clientID)) {
-            this.messages.get(clientID).add(message);
+            this.messages.get(clientID).add(m);
         }
         else{
             this.messages.put(clientID, new LinkedList<>());
-            this.messages.get(clientID).add(message);
+            this.messages.get(clientID).add(m);
         } 
+        notifySubscribers(m);
     }
 
     public void subscribe(ClientHandler c) {
@@ -47,43 +86,27 @@ public class Topic {
         return subscribers;
     }
 
-    // metodo che restituisce TUTTI i messaggi di un client
-    public List<Message> getClientMessages(String clientID) {
-        return this.messages.get(clientID);
-    }
-
-    // metodo che restituisce TUTTI i messaggi sul  topic NON in ORDINE 
-    public List<Message> getAllMessages() {
-        LinkedList<Message> allMessages = new LinkedList<>();
-        for(String key : this.messages.keySet()) {
-            allMessages.addAll(this.messages.get(key));
-        }
-
-        return allMessages;
-    }
-
     public String printClientMessages(String clientID) {
-        String formattedMessages = "";
-        for(Message m : this.getClientMessages(clientID)) {
-            formattedMessages += m.toString();
+        String print = "";
+        List<Message> clientMessages = this.getClientMessages(clientID);
+        if(clientMessages != null) {
+            for(Message m : clientMessages) {
+                print += "\n  - " + m.toString();
+            }
+            return "Messaggi inviati dal client '" +  clientID + "' sul topic '" +  this.name + "':" + print;
         }
-        return formattedMessages;
+        return "Nessun messaggio inviato dal client '" + clientID + "' sul topic '" + this.name + "'.";
     }
 
     public String printAllMessages() {
-        String formattedMessages = "";
+        String print = "";
         for(Message m : this.getAllMessages()) {
-            formattedMessages += m.toString();
+            print += "\n  - " + m.toString();
         }
-        return formattedMessages;
-    }
-
-    private Message findMessage(String messageID) {
-        for(Message m : this.getAllMessages()) {
-            if(m.getID().equals(messageID))
-                return m;
+        if(print != "") {
+            return "Tutti i messaggi sul topic '" + this.name + "':" + print;
         }
-        return null;
+        return "Nessun messaggio sul topic '" + this.name + "'.";
     }
 
     public boolean deleteMessage(String messageID) {
@@ -99,6 +122,7 @@ public class Topic {
         return false;
     }
 
+    
     @Override
     public String toString() {
         return this.name;

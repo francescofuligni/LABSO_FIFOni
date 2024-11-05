@@ -3,7 +3,6 @@ import java.util.HashMap;
 public class TopicsHandler {
     private HashMap<String,Topic> topics;
     // private int count;       // Non necessario -> uso TIMESTAMP
-    // TODO MECCANISMO PER GESTIRE ID MESSAGGI -> counter ?
 
     public TopicsHandler() {
         this.topics =  new HashMap<>();
@@ -36,6 +35,4 @@ public class TopicsHandler {
     public boolean deleteMessage(String topicName, String messageID) {
         return this.topics.get(topicName).deleteMessage(messageID);
     }
-
-    // TODO Metodo remove(topic) non richiesto -> complesso da gestire (vogliamo farlo lo stesso?)
 }

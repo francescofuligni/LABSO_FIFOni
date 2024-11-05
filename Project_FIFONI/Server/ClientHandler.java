@@ -47,6 +47,9 @@ public class ClientHandler implements Runnable {
                     switch (parts[0]) {
 
                         case "quit":
+                            if(this.role == Role.subscriber) {
+                                Server.topics.get(topicName).unscribe(this);
+                            }
                             closed = true;
                             toClient.println("Connessione chiusa.");
                             break;

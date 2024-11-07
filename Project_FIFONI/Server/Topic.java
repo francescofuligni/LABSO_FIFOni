@@ -18,11 +18,13 @@ public class Topic {
     private Map<String, List<Message>> messages;
     private String name;
     private Set<ClientHandler> subscribers;
+    private int count;
 
     public Topic(String name) {
         this.name = name;
         this.messages = new HashMap<>();
         this.subscribers = new HashSet<>();
+        this.count = 0;
     }
 
     
@@ -62,7 +64,8 @@ public class Topic {
     
     // metodo che permette a un publisher di aggiungere un messaggio al topic
     public void sendMessage(String clientID, String text) {
-        Message m = new Message(text);
+        count++;
+        Message m = new Message(text, count);
         if(this.messages.containsKey(clientID)) {
             this.messages.get(clientID).add(m);
         }

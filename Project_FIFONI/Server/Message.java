@@ -12,8 +12,9 @@ public class Message{
     private String text;
     private LocalDateTime date;
 
-    public Message(String text){
-        this.id = "msg_" + System.currentTimeMillis();
+    public Message(String text, int id){
+        this.id = "msg_" + id;  // Univoco nel topic
+        // this.id = "msg_" + System.currentTimeMillis(); // Univoco globalmente
         this.text = text;
         this.date = LocalDateTime.now();
     }

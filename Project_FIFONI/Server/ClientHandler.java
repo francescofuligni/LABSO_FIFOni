@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 
@@ -47,7 +48,7 @@ public class ClientHandler implements Runnable {
                     switch (parts[0]) {
 
                         case "quit":
-                            if(this.role == Role.subscriber) {
+                            if(role == Role.subscriber) {
                                 Server.topics.get(topicName).unscribe(this);
                             }
                             closed = true;
@@ -55,7 +56,11 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "show":
-                            toClient.println(Server.topics.show());
+                            if(role == Role.undefined) {
+                                toClient.println(Server.topics.show());
+                            } else {
+                                toClient.println("ERRORE: già registrato come " + role + ".");
+                            }
                             break;
 
                         case "publish":
@@ -142,6 +147,9 @@ public class ClientHandler implements Runnable {
             System.out.println("Connessione chiusa.");
         } catch (IOException e) {
             System.err.println("CLIENTHANDLER - IOException catturata: " + e);
+            e.printStackTrace();
+        } catch (NoSuchElementException e) {
+            System.err.println("CLIENTHANDLER - NoSuchElementException catturata: " + e);
             e.printStackTrace();
         }
     }

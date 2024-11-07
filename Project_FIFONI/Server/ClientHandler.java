@@ -47,7 +47,7 @@ public class ClientHandler implements Runnable {
                     switch (parts[0]) {
 
                         case "quit":
-                            if(this.role == Role.subscriber) {
+                            if(role == Role.subscriber) {
                                 Server.topics.get(topicName).unscribe(this);
                             }
                             closed = true;
@@ -55,7 +55,11 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "show":
-                            toClient.println(Server.topics.show());
+                            if(role == Role.undefined) {
+                                toClient.println(Server.topics.show());
+                            } else {
+                                toClient.println("ERRORE: già registrato come " + role + ".");
+                            }
                             break;
 
                         case "publish":

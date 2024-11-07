@@ -55,8 +55,6 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "show":
-                            // Visualizza tutti i topic -> TODO !!! DA CHIEDERE !!!
-                            // SE SI VUOLE FARLI CREARE SOLO DA PUBLISHER O DA TUTTI I CLIENT
                             toClient.println(Server.topics.show());
                             break;
 
@@ -67,13 +65,13 @@ public class ClientHandler implements Runnable {
                                     role = Role.publisher;
                                     
                                     Server.topics.addIfAbsent(topicName);
-                                    toClient.println("Registrato come publisher sul topic '" + topicName + "'.\nComandi " + role
-                                    + ":\n  > send <message>\n  > list\n  > listall\n  > quit");
+                                    toClient.println("Registrato come " + role + " sul topic '" + topicName + 
+                                    "'.\nComandi " + role + ":\n  > send <message>\n  > list\n  > listall\n  > quit");
                                 } else {
                                     toClient.println("ERRORE: nessun topic specificato.");
                                 }
                             } else {
-                                toClient.println("ERRORE: già registrato come '" + role + "'.");
+                                toClient.println("ERRORE: già registrato come " + role + ".");
                             }
                             break;
 
@@ -84,10 +82,10 @@ public class ClientHandler implements Runnable {
                                     role = Role.subscriber;
 
                                     Server.topics.addIfAbsent(topicName);
-                                    Server.topics.get(topicName).subscribe(this);      // aggiunge il client alla lista degli iscritti al topic
+                                    Server.topics.get(topicName).subscribe(this);
                                     
-                                    toClient.println("Iscritto al topic '" + topicName + "'.\nComandi " + role 
-                                    + ":\n  > listall\n  > quit");
+                                    toClient.println("Registrato come " + role + " al topic '" + topicName + 
+                                    "'.\nComandi " + role + ":\n  > listall\n  > quit");
                                 } else {
                                     toClient.println("ERRORE: nessun topic specificato.");
                                 }
@@ -97,32 +95,35 @@ public class ClientHandler implements Runnable {
                             break;
 
                         case "send":
-                            if (role == Role.publisher && parts.length > 1) {
-
-                                Server.topics.get(topicName).sendMessage(clientID, parts[1].trim());
-                                // Notifica i subscriber all'interno del metodo !
-                                toClient.println("Messaggio inviato sul topic '" + topicName + "'.");
-
-                            } else if (role != Role.publisher) {
+                            if (role == Role.publisher) {
+                                if (parts.length > 1) {
+                                    Server.topics.get(topicName).sendMessage(clientID, parts[1].trim());
+                                    toClient.println("Messaggio inviato sul topic '" + topicName + "'.");
+                                } else {
+                                    toClient.println("ERRORE: nessun messaggio specificato.");
+                                }
+                            } else if(role == Role.subscriber) {
                                 toClient.println("ERRORE: già registrato come " + role + ".");
                             } else {
-                                toClient.println("ERRORE: nessun messaggio specificato.");
+                                toClient.println("Comando <" + parts[0] + "> sconosciuto."); 
                             }
                             break;
 
                         case "list":
-                            if (role == Role.publisher && topicName != null) {
+                            if (role == Role.publisher) {
                                 toClient.println(Server.topics.get(topicName).printClientMessages(clientID));
+                            } else if(role == Role.subscriber) {
+                                toClient.println("ERRORE: già registrato come " + role + ".");
                             } else {
-                                toClient.println("ERRORE: nessun topic selezionato.");
+                                toClient.println("Comando <" + parts[0] + "> sconosciuto.");
                             }
                             break;
 
                         case "listall":
-                            if (topicName != null) {
+                            if(role != Role.undefined) {
                                 toClient.println(Server.topics.get(topicName).printAllMessages());
                             } else {
-                                toClient.println("Errore: nessun topic selezionato.");
+                                toClient.println("Comando <" + parts[0] + "> sconosciuto.");
                             }
                             break;
 

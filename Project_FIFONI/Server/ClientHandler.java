@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 
@@ -146,6 +147,9 @@ public class ClientHandler implements Runnable {
             System.out.println("Connessione chiusa.");
         } catch (IOException e) {
             System.err.println("CLIENTHANDLER - IOException catturata: " + e);
+            e.printStackTrace();
+        } catch (NoSuchElementException e) {
+            System.err.println("CLIENTHANDLER - NoSuchElementException catturata: " + e);
             e.printStackTrace();
         }
     }

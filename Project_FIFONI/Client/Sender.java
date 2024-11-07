@@ -35,7 +35,7 @@ public class Sender implements Runnable {
             }
             System.out.println("Sender terminato.");
         } catch (IOException e) {
-            System.err.println("SENDER - IOException caught: " + e);
+            System.err.println("SENDER - IOException catturata: " + e);
             e.printStackTrace();
         } finally {
             userInput.close();

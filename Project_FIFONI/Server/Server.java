@@ -6,48 +6,6 @@ public class Server {
 
     public static TopicsHandler topics = new TopicsHandler();
 
-    private static void interactiveSession(Scanner input, String topicName) {
-        System.out.println("\n* SESSIONE INTERATTIVA AVVIATA *\nComandi sessione interattiva:\n  > :listall\n  > :delete <id>\n  > :end");
-
-        boolean closed = false;
-        while (!closed) {
-            String command = input.nextLine().trim();
-            String[] parts = command.split(" ", 2);
-
-            switch (parts[0]) {
-
-                // Elenca tutti i messaggi sul topic
-                case ":listall":
-                    System.out.println(topics.get(topicName).printAllMessages());
-                    break;
-                
-                // Elimina un messaggio su un topic
-                case ":delete":
-                    if(parts.length>1) {
-                        String messageID = parts[1].trim();
-                        if(topics.deleteMessage(topicName, messageID)) {
-                            System.out.println("Messaggio '" + messageID + "' eliminato.");
-                        } else {
-                            System.out.println("ERRORE: messageID '" +  messageID + "' inesistente.");
-                        }
-                    } else {
-                        System.out.println("ERRORE: nessun messageID selezionato.");
-                    }
-                    break;
-                
-                // Termina la sessione interattiva
-                case ":end":
-                    closed = true;
-                    break;
-
-                default:
-                    System.out.println("Comando <" + command + "> sconosciuto."); 
-                    break;
-            }
-        }
-        System.out.println("* SESSIONE INTERATTIVA TERMINATA *\n");
-    }
-
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -93,7 +51,7 @@ public class Server {
                         if(parts.length>1) {
                             String topicName = parts[1].trim();
                             if(topics.contains(topicName)) {
-                                interactiveSession(input, topicName);
+                                topics.get(topicName).interactiveSession(input);
                             } else {
                                 System.out.println("ERRORE: topic '" + topicName + "' insesitente.");
                             }
@@ -121,6 +79,9 @@ public class Server {
             System.out.println("Thread principale terminato.");
         } catch (IOException e) {
             System.err.println("SERVER - IOException catturata: " + e);
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.err.println("SERVER - InterruptedException catturata: " + e);
             e.printStackTrace();
         } finally {
             input.close();

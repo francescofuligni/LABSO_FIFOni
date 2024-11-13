@@ -2,18 +2,16 @@ import java.util.HashMap;
 
 public class TopicsHandler {
     private HashMap<String,Topic> topics;
-    // private int count;       // Non necessario -> uso TIMESTAMP
 
     public TopicsHandler() {
         this.topics =  new HashMap<>();
-        // this.count = 0;
     }
 
     public Topic get(String topicName) {
         return this.topics.get(topicName);
     }
 
-    public void addIfAbsent(String topicName) {
+    public synchronized void addIfAbsent(String topicName) {
         topics.putIfAbsent(topicName, new Topic(topicName));
     }
 

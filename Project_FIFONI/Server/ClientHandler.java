@@ -40,8 +40,6 @@ public class ClientHandler implements Runnable {
                 String request = fromClient.nextLine().trim();
 
                 if (!Thread.interrupted()) {
-                    System.out.println("Richiesta: " + request);
-
                     // Divide la richiesta in 2 parti (al massimo): comando e input (a seconda del comando)
                     String[] parts = request.split(" ", 2);
 
@@ -102,7 +100,7 @@ public class ClientHandler implements Runnable {
                         case "send":
                             if (role == Role.publisher) {
                                 if (parts.length > 1) {
-                                    Server.topics.get(topicName).sendMessage(clientID, parts[1].trim());
+                                    Server.topics.get(topicName).send(clientID, parts[1].trim());
                                     toClient.println("Messaggio inviato sul topic '" + topicName + "'.");
                                 } else {
                                     toClient.println("ERRORE: nessun messaggio specificato.");
@@ -116,7 +114,7 @@ public class ClientHandler implements Runnable {
 
                         case "list":
                             if (role == Role.publisher) {
-                                toClient.println(Server.topics.get(topicName).printClientMessages(clientID));
+                                toClient.println(Server.topics.get(topicName).list(clientID));
                             } else if(role == Role.subscriber) {
                                 toClient.println("ERRORE: già registrato come " + role + ".");
                             } else {
@@ -126,7 +124,7 @@ public class ClientHandler implements Runnable {
 
                         case "listall":
                             if(role != Role.undefined) {
-                                toClient.println(Server.topics.get(topicName).printAllMessages());
+                                toClient.println(Server.topics.get(topicName).listAll());
                             } else {
                                 toClient.println("Comando <" + parts[0] + "> sconosciuto.");
                             }
@@ -136,6 +134,7 @@ public class ClientHandler implements Runnable {
                             toClient.println("Comando <" + parts[0] + "> sconosciuto.");
                             break;
                     }
+                    System.out.println("Richiesta: " + request);
                 } else {
                     toClient.println("quit");
                     break;
@@ -150,6 +149,9 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         } catch (NoSuchElementException e) {
             System.err.println("CLIENTHANDLER - NoSuchElementException catturata: " + e);
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            System.err.println("CLIENTHANDLER - InterruptedException catturata: " + e);
             e.printStackTrace();
         }
     }

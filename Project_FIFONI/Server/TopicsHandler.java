@@ -31,8 +31,4 @@ public class TopicsHandler {
         }
         return "Nessun topic creato.";
     }
-
-    public boolean deleteMessage(String topicName, String messageID) {
-        return this.topics.get(topicName).deleteMessage(messageID);
-    }
 }

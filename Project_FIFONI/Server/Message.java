@@ -25,7 +25,7 @@ public class Message{
 
     // Formatta correttamente la data per la stampa
     private String printDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss.SSSSS");
         return date.format(formatter);
     }
 

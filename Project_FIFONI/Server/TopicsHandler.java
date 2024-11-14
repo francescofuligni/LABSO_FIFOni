@@ -25,7 +25,7 @@ public class TopicsHandler {
         return this.topics.get(topicName);
     }
 
-    public synchronized void addIfAbsent(String topicName) throws InterruptedException {
+    public synchronized void putIfAbsent(String topicName) throws InterruptedException {
         while(readCount > 0)
             wait();
         

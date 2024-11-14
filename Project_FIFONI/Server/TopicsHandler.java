@@ -28,6 +28,7 @@ public class TopicsHandler {
     public synchronized void addIfAbsent(String topicName) throws InterruptedException {
         while(readCount > 0)
             wait();
+        
         topics.putIfAbsent(topicName, new Topic(topicName));
         notifyAll();
     }

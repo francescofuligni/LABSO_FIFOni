@@ -20,7 +20,6 @@ public class Topic {
     private String name;
     private Set<ClientHandler> subscribers;
     private int idCount;
-
     private int listCount;
 
     public Topic(String name) {
@@ -28,7 +27,6 @@ public class Topic {
         this.messages = new HashMap<>();
         this.subscribers = new HashSet<>();
         this.idCount = 0;
-
         this.listCount = 0;
     }
 
@@ -68,7 +66,6 @@ public class Topic {
 
     private boolean deleteMessage(String messageID) {
         Message messageToRemove = findMessage(messageID);
-        
         if (messageToRemove != null) {
             for (List<Message> clientMessages : messages.values()) {
                 if (clientMessages.remove(messageToRemove)) {
@@ -132,7 +129,6 @@ public class Topic {
             for(Message m : clientMessages) {
                 print += "\n  - " + m.toString();
             }
-
             endList();
             return "Messaggi inviati dal client '" +  clientID + "' sul topic '" +  this.name + "':" + print;
         }

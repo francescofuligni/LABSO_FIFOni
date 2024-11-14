@@ -42,7 +42,7 @@ public class TopicsHandler {
         return this.topics.get(topicName);
     }
 
-    public synchronized void addIfAbsent(String topicName) throws InterruptedException {
+    public void addIfAbsent(String topicName) throws InterruptedException {
         startAdd();
         topics.putIfAbsent(topicName, new Topic(topicName));
         endAdd();

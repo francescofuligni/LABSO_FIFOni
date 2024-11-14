@@ -22,15 +22,14 @@ public class Topic {
     private int idCount;
 
     private int listCount;
-    private boolean isSending;
 
     public Topic(String name) {
         this.name = name;
         this.messages = new HashMap<>();
         this.subscribers = new HashSet<>();
         this.idCount = 0;
+
         this.listCount = 0;
-        this.isSending = false;
     }
 
     
@@ -82,8 +81,6 @@ public class Topic {
 
 
     private synchronized void startList() throws InterruptedException {
-        while(isSending)
-            wait();
         listCount++;
     }
 
@@ -93,22 +90,11 @@ public class Topic {
             notifyAll();
     }
 
-    private synchronized void startSend() throws InterruptedException {
-        while(listCount > 0 || isSending)
-            wait();
-        isSending = true;
-    }
-
-    private synchronized void endSend(Message m) {
-        notifySubscribers(m);
-        isSending = false;
-        notifyAll();
-    }
-    
     
     // metodo che permette a un publisher di aggiungere un messaggio al topic
-    public void send(String clientID, String text) throws InterruptedException {
-        startSend();
+    public synchronized void send(String clientID, String text) throws InterruptedException {
+        while(listCount > 0)
+            wait();
 
         idCount++;
         Message m = new Message(text, idCount);
@@ -120,7 +106,8 @@ public class Topic {
             this.messages.get(clientID).add(m);
         }
 
-        endSend(m);
+        notifySubscribers(m);
+        notifyAll();
     }
 
     public synchronized void subscribe(ClientHandler c) {
@@ -172,7 +159,7 @@ public class Topic {
     // Sessione interattiva avviata dal server
     public synchronized void interactiveSession(Scanner input) throws InterruptedException {
         System.out.println("\n* SESSIONE INTERATTIVA AVVIATA *\nComandi sessione interattiva:\n  > :listall\n  > :delete <id>\n  > :end");
-
+        
         boolean closed = false;
         while (!closed) {
             String command = input.nextLine().trim();

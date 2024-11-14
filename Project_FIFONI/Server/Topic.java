@@ -20,9 +20,7 @@ public class Topic {
     private String name;
     private Set<ClientHandler> subscribers;
     private int idCount;
-
     private int listCount;
-    private boolean isSending;
 
     public Topic(String name) {
         this.name = name;
@@ -30,7 +28,6 @@ public class Topic {
         this.subscribers = new HashSet<>();
         this.idCount = 0;
         this.listCount = 0;
-        this.isSending = false;
     }
 
     
@@ -69,7 +66,6 @@ public class Topic {
 
     private boolean deleteMessage(String messageID) {
         Message messageToRemove = findMessage(messageID);
-        
         if (messageToRemove != null) {
             for (List<Message> clientMessages : messages.values()) {
                 if (clientMessages.remove(messageToRemove)) {
@@ -82,22 +78,20 @@ public class Topic {
 
 
     private synchronized void startList() throws InterruptedException {
-        while(isSending)
-            wait();
         listCount++;
     }
 
     private synchronized void endList() {
-        notifyAll();
         listCount--;
+        if(listCount == 0)
+            notifyAll();
     }
-    
+
     
     // metodo che permette a un publisher di aggiungere un messaggio al topic
     public synchronized void send(String clientID, String text) throws InterruptedException {
-        while(listCount > 0 || isSending)
+        while(listCount > 0)
             wait();
-        isSending = true;
 
         idCount++;
         Message m = new Message(text, idCount);
@@ -107,10 +101,9 @@ public class Topic {
         else{
             this.messages.put(clientID, new LinkedList<>());
             this.messages.get(clientID).add(m);
-        } 
-        notifySubscribers(m);
+        }
 
-        isSending = false;
+        notifySubscribers(m);
         notifyAll();
     }
 
@@ -136,7 +129,6 @@ public class Topic {
             for(Message m : clientMessages) {
                 print += "\n  - " + m.toString();
             }
-
             endList();
             return "Messaggi inviati dal client '" +  clientID + "' sul topic '" +  this.name + "':" + print;
         }
@@ -163,7 +155,7 @@ public class Topic {
     // Sessione interattiva avviata dal server
     public synchronized void interactiveSession(Scanner input) throws InterruptedException {
         System.out.println("\n* SESSIONE INTERATTIVA AVVIATA *\nComandi sessione interattiva:\n  > :listall\n  > :delete <id>\n  > :end");
-
+        
         boolean closed = false;
         while (!closed) {
             String command = input.nextLine().trim();

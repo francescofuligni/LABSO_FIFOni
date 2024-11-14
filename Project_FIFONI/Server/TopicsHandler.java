@@ -2,65 +2,56 @@ import java.util.HashMap;
 
 public class TopicsHandler {
     private HashMap<String,Topic> topics;
-
-    private boolean isAdding;
     private int readCount;
 
     public TopicsHandler() {
         this.topics =  new HashMap<>();
-        this.isAdding = false;
         this.readCount = 0;
     }
 
 
-    private synchronized void startReading() throws InterruptedException {
-        while(isAdding)
-            wait();
+    private synchronized void startRead() throws InterruptedException {
         readCount++;
     }
 
-    private synchronized void endReading() {
-        notifyAll();
+    private synchronized void endRead() {
         readCount--;
+        if(readCount == 0)
+            notifyAll();
     }
-
     
+
     public Topic get(String topicName) {
         return this.topics.get(topicName);
     }
 
     public synchronized void addIfAbsent(String topicName) throws InterruptedException {
-        while(readCount > 0 || isAdding)
+        while(readCount > 0)
             wait();
-        isAdding = true;
-
-        topics.putIfAbsent(topicName, new Topic(topicName));
         
-        isAdding = false;
+        topics.putIfAbsent(topicName, new Topic(topicName));
         notifyAll();
     }
 
     public boolean contains(String topicName) throws InterruptedException {
-        startReading();
-
+        startRead();
         boolean flag = this.topics.containsKey(topicName);
-
-        endReading();
+        endRead();
         return flag;
     }
 
     public String show() throws InterruptedException {
-        startReading();
+        startRead();
 
         String print = "";
         if(!topics.isEmpty()) {
             for(String t : this.topics.keySet()) {
                 print += "\n  - " + t;
             }
-            endReading();
+            endRead();
             return "Tutti i topic:" + print;
         }
-        endReading();
+        endRead();
         return "Nessun topic creato.";
     }
 }

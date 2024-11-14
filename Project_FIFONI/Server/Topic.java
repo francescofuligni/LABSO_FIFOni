@@ -92,13 +92,23 @@ public class Topic {
         if(listCount == 0)
             notifyAll();
     }
-    
-    
-    // metodo che permette a un publisher di aggiungere un messaggio al topic
-    public synchronized void send(String clientID, String text) throws InterruptedException {
+
+    private synchronized void startSend() throws InterruptedException {
         while(listCount > 0 || isSending)
             wait();
         isSending = true;
+    }
+
+    private synchronized void endSend(Message m) {
+        notifySubscribers(m);
+        isSending = false;
+        notifyAll();
+    }
+    
+    
+    // metodo che permette a un publisher di aggiungere un messaggio al topic
+    public void send(String clientID, String text) throws InterruptedException {
+        startSend();
 
         idCount++;
         Message m = new Message(text, idCount);
@@ -108,11 +118,9 @@ public class Topic {
         else{
             this.messages.put(clientID, new LinkedList<>());
             this.messages.get(clientID).add(m);
-        } 
-        notifySubscribers(m);
+        }
 
-        isSending = false;
-        notifyAll();
+        endSend(m);
     }
 
     public synchronized void subscribe(ClientHandler c) {

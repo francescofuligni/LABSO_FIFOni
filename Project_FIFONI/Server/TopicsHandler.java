@@ -13,17 +13,29 @@ public class TopicsHandler {
     }
 
 
-    private synchronized void startReading() throws InterruptedException {
+    private synchronized void startRead() throws InterruptedException {
         while(isAdding)
             wait();
         readCount++;
     }
 
-    private synchronized void endReading() {
+    private synchronized void endRead() {
         readCount--;
         if(readCount == 0)
             notifyAll();
     }
+
+    private synchronized void startAdd() throws InterruptedException {
+        while(readCount > 0 || isAdding)
+            wait();
+        isAdding = true;
+    }
+
+    private synchronized void endAdd() {
+        isAdding = false;
+        notifyAll();
+    }
+    
 
     
     public Topic get(String topicName) {
@@ -31,37 +43,30 @@ public class TopicsHandler {
     }
 
     public synchronized void addIfAbsent(String topicName) throws InterruptedException {
-        while(readCount > 0 || isAdding)
-            wait();
-        isAdding = true;
-
+        startAdd();
         topics.putIfAbsent(topicName, new Topic(topicName));
-        
-        isAdding = false;
-        notifyAll();
+        endAdd();
     }
 
     public boolean contains(String topicName) throws InterruptedException {
-        startReading();
-
+        startRead();
         boolean flag = this.topics.containsKey(topicName);
-
-        endReading();
+        endRead();
         return flag;
     }
 
     public String show() throws InterruptedException {
-        startReading();
+        startRead();
 
         String print = "";
         if(!topics.isEmpty()) {
             for(String t : this.topics.keySet()) {
                 print += "\n  - " + t;
             }
-            endReading();
+            endRead();
             return "Tutti i topic:" + print;
         }
-        endReading();
+        endRead();
         return "Nessun topic creato.";
     }
 }

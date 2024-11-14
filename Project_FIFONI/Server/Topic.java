@@ -88,8 +88,9 @@ public class Topic {
     }
 
     private synchronized void endList() {
-        notifyAll();
         listCount--;
+        if(listCount == 0)
+            notifyAll();
     }
     
     

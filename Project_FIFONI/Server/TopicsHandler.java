@@ -20,8 +20,9 @@ public class TopicsHandler {
     }
 
     private synchronized void endReading() {
-        notifyAll();
         readCount--;
+        if(readCount == 0)
+            notifyAll();
     }
 
     

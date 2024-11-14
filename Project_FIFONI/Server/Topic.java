@@ -19,18 +19,18 @@ public class Topic {
     private Map<String, List<Message>> messages;
     private String name;
     private Set<ClientHandler> subscribers;
-    private int countID;
+    private int idCount;
 
-    private int countReaders;
-    private boolean isWriting;
+    private int listCount;
+    private boolean isSending;
 
     public Topic(String name) {
         this.name = name;
         this.messages = new HashMap<>();
         this.subscribers = new HashSet<>();
-        this.countID = 0;
-        this.countReaders = 0;
-        this.isWriting = false;
+        this.idCount = 0;
+        this.listCount = 0;
+        this.isSending = false;
     }
 
     
@@ -81,28 +81,26 @@ public class Topic {
     }
 
 
-    private synchronized void startReading() throws InterruptedException {
-        while(isWriting) {
+    private synchronized void startList() throws InterruptedException {
+        while(isSending)
             wait();
-        }
-        countReaders++;
+        listCount++;
     }
 
-    private synchronized void endReading() {
+    private synchronized void endList() {
         notifyAll();
-        countReaders--;
+        listCount--;
     }
     
     
     // metodo che permette a un publisher di aggiungere un messaggio al topic
     public synchronized void send(String clientID, String text) throws InterruptedException {
-        while(countReaders > 0 || isWriting) {
+        while(listCount > 0 || isSending)
             wait();
-        }
-        isWriting = true;
+        isSending = true;
 
-        countID++;
-        Message m = new Message(text, countID);
+        idCount++;
+        Message m = new Message(text, idCount);
         if(this.messages.containsKey(clientID)) {
             this.messages.get(clientID).add(m);
         }
@@ -112,16 +110,16 @@ public class Topic {
         } 
         notifySubscribers(m);
 
-        isWriting = false;
+        isSending = false;
         notifyAll();
     }
 
-    public void subscribe(ClientHandler c) {
+    public synchronized void subscribe(ClientHandler c) {
         this.subscribers.add(c);
     }
 
     // da invocare sul topic quando un client subscriber viene terminato
-    public void unscribe(ClientHandler c) {
+    public synchronized void unscribe(ClientHandler c) {
         this.subscribers.remove(c);
     }
 
@@ -130,7 +128,7 @@ public class Topic {
     }
 
     public String list(String clientID) throws InterruptedException {
-        startReading();
+        startList();
 
         String print = "";
         List<Message> clientMessages = this.getClientMessages(clientID);
@@ -139,25 +137,25 @@ public class Topic {
                 print += "\n  - " + m.toString();
             }
 
-            endReading();
+            endList();
             return "Messaggi inviati dal client '" +  clientID + "' sul topic '" +  this.name + "':" + print;
         }
-        endReading();
+        endList();
         return "Nessun messaggio inviato dal client '" + clientID + "' sul topic '" + this.name + "'.";
     }
 
     public String listAll() throws InterruptedException {
-        startReading();
+        startList();
 
         String print = "";
         for(Message m : this.getAllMessages()) {
             print += "\n  - " + m.toString();
         }
         if(print != "") {
-            endReading();
+            endList();
             return "Tutti i messaggi sul topic '" + this.name + "':" + print;
         }
-        endReading();
+        endList();
         return "Nessun messaggio sul topic '" + this.name + "'.";
     }
 

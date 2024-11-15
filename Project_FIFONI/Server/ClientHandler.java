@@ -4,7 +4,28 @@ import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-
+/*
+ * La classe `ClientHandler` è un componente che gestisce le connessioni dei client con il server.
+ * Ogni client connesso viene gestito da una propria istanza di `ClientHandler`, che si occupa di interpretare
+ * i comandi ricevuti dal client, come l'iscrizione a un topic, la pubblicazione di messaggi e la disconnessione.
+ * La classe è progettata per supportare ruoli differenti per i client, come `publisher` e `subscriber`, e per interagire
+ * con un sistema di topic dove i client possono registrarsi per ricevere o inviare messaggi.
+ * 
+ * La classe supporta diversi comandi che i client possono inviare:
+ * - `quit`: Chiude la connessione.
+ * - `show`: Mostra la lista dei topic disponibili.
+ * - `publish`: Consente di registrarsi come publisher su un topic e inviare messaggi.
+ * - `subscribe`: Consente di registrarsi come subscriber su un topic.
+ * - `send`: Permette al publisher di inviare un messaggio.
+ * - `list`: Permette al publisher di vedere i propri messaggi inviati.
+ * - `listall`: Mostra tutti i messaggi di un topic, visibili sia ai publisher che ai subscriber.
+ * 
+ * Ogni comando viene gestito in un ciclo continuo finché il client non invia un comando di disconnessione o il thread viene interrotto.
+ * Se il client invia comandi non riconosciuti, viene inviata una risposta di errore.
+ * 
+ * L'implementazione consente al server di gestire molteplici client simultaneamente in modo efficiente,
+ * isolando le operazioni di ciascun client all'interno di un proprio thread.
+ */
 public class ClientHandler implements Runnable {
 
     // Classe per gestire il ruolo del client
@@ -26,12 +47,20 @@ public class ClientHandler implements Runnable {
         return this.socket;
     }
 
+    /*
+     * Metodo principale che gestisce il ciclo di vita del client, ascoltando i comandi e rispondendo.
+     * - Legge i comandi dal client.
+     * - Elabora le richieste e invia risposte appropriate.
+     * - Gestisce i ruoli (publisher, subscriber).
+     * - Interrompe il ciclo quando il client invia il comando "quit" o quando si verifica un errore.
+     */
+
     @Override
     public void run() {
         try {
             Scanner fromClient = new Scanner(socket.getInputStream());
             PrintWriter toClient = new PrintWriter(socket.getOutputStream(), true);
-
+            // Scanner per leggere i comandi dal client e PrintWriter per inviare risposte
             System.out.println("Thread " + Thread.currentThread() + " in ascolto...");
 
             boolean closed = false;
@@ -42,9 +71,9 @@ public class ClientHandler implements Runnable {
                 if (!Thread.interrupted()) {
                     // Divide la richiesta in 2 parti (al massimo): comando e input (a seconda del comando)
                     String[] parts = request.split(" ", 2);
-
+                    // Gestisce i vari comandi del protocollo client-server
                     switch (parts[0]) {
-
+                        // Comando "quit": chiude la connessione e deregistra il client, se necessario
                         case "quit":
                             if(role == Role.subscriber) {
                                 Server.topics.get(topicName).unscribe(this);
@@ -52,7 +81,7 @@ public class ClientHandler implements Runnable {
                             closed = true;
                             toClient.println("Connessione chiusa.");
                             break;
-
+                        // Comando "show": mostra la lista dei topic se il client non è ancora registrato    
                         case "show":
                             if(role == Role.undefined) {
                                 toClient.println(Server.topics.show());
@@ -60,7 +89,7 @@ public class ClientHandler implements Runnable {
                                 toClient.println("ERRORE: già registrato come " + role + ".");
                             }
                             break;
-
+                        // Comando "publish": registra il client come publisher su un topic    
                         case "publish":
                             if (role == Role.undefined) {
                                 if (parts.length > 1) {
@@ -77,7 +106,7 @@ public class ClientHandler implements Runnable {
                                 toClient.println("ERRORE: già registrato come " + role + ".");
                             }
                             break;
-
+                        // Comando "subscribe": registra il client come subscriber su un topic    
                         case "subscribe":
                             if (role == Role.undefined) {
                                 if (parts.length > 1) {
@@ -96,7 +125,7 @@ public class ClientHandler implements Runnable {
                                 toClient.println("ERRORE: già registrato come " + role + ".");
                             }
                             break;
-
+                        // Comando "send": invia un messaggio sul topic per i publisher
                         case "send":
                             if (role == Role.publisher) {
                                 if (parts.length > 1) {
@@ -111,7 +140,7 @@ public class ClientHandler implements Runnable {
                                 toClient.println("Comando <" + parts[0] + "> sconosciuto."); 
                             }
                             break;
-
+                        // Comando "list": elenca i messaggi inviati dal publisher    
                         case "list":
                             if (role == Role.publisher) {
                                 toClient.println(Server.topics.get(topicName).list(clientID));
@@ -121,7 +150,7 @@ public class ClientHandler implements Runnable {
                                 toClient.println("Comando <" + parts[0] + "> sconosciuto.");
                             }
                             break;
-
+                        // Comando "listall": mostra tutti i messaggi del topic    
                         case "listall":
                             if(role != Role.undefined) {
                                 toClient.println(Server.topics.get(topicName).listAll());
@@ -129,7 +158,7 @@ public class ClientHandler implements Runnable {
                                 toClient.println("Comando <" + parts[0] + "> sconosciuto.");
                             }
                             break;
-
+                         // Risposta per comandi non riconosciuti   
                         default:
                             toClient.println("Comando <" + parts[0] + "> sconosciuto.");
                             break;
@@ -140,7 +169,7 @@ public class ClientHandler implements Runnable {
                     break;
                 }
             }
-
+            // Chiude le risorse al termine del ciclo
             fromClient.close();
             socket.close();
             System.out.println("Connessione chiusa.");

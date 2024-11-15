@@ -3,10 +3,10 @@ import java.net.ServerSocket;
 import java.util.Scanner;
 
 public class Server {
-
+    
     public static TopicsHandler topics = new TopicsHandler();
 
-
+    // Verifica che sia stata passata una porta come argomento e se non è cosi termina l'esecuzione
     public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("Utilizzo: java Server <porta>");
@@ -29,6 +29,7 @@ public class Server {
             System.out.println("Comandi server:\n  > show\n  > inspect <topic>\n  > quit");
 
             boolean closed = false;
+            // Legge un comando dalla console dividendo il comando e i parametri
             while (!closed) {
                 command = input.nextLine().trim();
                 String[] parts = command.split(" ", 2);

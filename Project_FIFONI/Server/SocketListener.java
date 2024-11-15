@@ -5,6 +5,10 @@ import java.net.SocketTimeoutException;
 import java.util.LinkedList;
 
 public class SocketListener implements Runnable {
+
+    /* Rappresenta un listener per il server che gestisce connessioni Client
+    *  Ogni volta che un Client si connette viene creato un nuovo thread per gestirlo
+    */
     private ServerSocket server;
     private LinkedList<Thread> children = new LinkedList<>();
 
@@ -12,11 +16,13 @@ public class SocketListener implements Runnable {
         this.server = server;
     }
 
+    // Metodo eseguito quando il thread associato a SocketListener viene avviato
     @Override
     public void run() {
         try {
             System.out.println("In attesa di connessioni...");
             this.server.setSoTimeout(5000);
+            // Ascolta le connessioni finchè il thread non viene interrotto
             while (!Thread.interrupted()) {
                 try {
                     

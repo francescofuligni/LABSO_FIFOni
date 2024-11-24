@@ -1,7 +1,18 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Scanner;
-
+/*
+ * Classe `Server`:
+ * - Punto di ingresso per un server socket che gestisce connessioni client e topic.
+ * - La porta viene specificata come argomento all'avvio.
+ * - Gestione concorrente delle connessioni tramite un thread dedicato (`SocketListener`).
+ * - Interfaccia interattiva per l'amministrazione con comandi:
+ *   - `show`: Mostra i topic attivi.
+ *   - `inspect <topic>`: Analizza un topic specifico.
+ *   - `quit`: Termina il server.
+ * - Gestisce eccezioni di rete (`IOException`) e interruzioni dei thread (`InterruptedException`).
+ * - Garantisce chiusura ordinata delle risorse al termine.
+ */
 public class Server {
     
     public static TopicsHandler topics = new TopicsHandler();

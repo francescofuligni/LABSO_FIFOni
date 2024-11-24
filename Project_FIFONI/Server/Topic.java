@@ -7,14 +7,22 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+/*
+ * Classe `Topic`:
+ * - Gestisce un argomento di discussione identificato da un nome.
+ * - Mantiene una mappa di messaggi inviati dai client (`<ClientID, List<Message>>`) e un insieme di subscriber per notifiche.
+ * - Funzionalità principali:
+ *   - Invio di messaggi da parte dei client e notifica automatica ai subscriber.
+ *   - Elenco di messaggi per client (`list`) o globali (`listAll`).
+ *   - Eliminazione di messaggi tramite ID.
+ *   - Sessione interattiva per amministratori per visualizzare o eliminare messaggi.
+ * - Consente di iscrivere o rimuovere subscriber.
+ * - Fornisce metodi per recuperare o gestire messaggi in base al client o all'ID.
+ */
 
 public class Topic {
 
-    /*
-     * Rappresenta un topic.
-     * Il topic ha un nome e una lista di messaggi associata.
-     */
-
+ 
     // <Client ID, LinkedList di messaggi> traccia i messaggi inviati da ciascun client
     private Map<String, List<Message>> messages;
     private String name;

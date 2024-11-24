@@ -3,14 +3,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.LinkedList;
+import java.util.List;
+
+/*
+ * Classe `SocketListener`:
+ * - Listener per il server che gestisce connessioni client tramite un `ServerSocket`.
+ * - Per ogni client connesso, crea un nuovo thread (`ClientHandler`) dedicato alla gestione della connessione.
+ * - Supporta timeout configurabile per il socket, permettendo controlli regolari sullo stato del thread principale.
+ * - Gestisce in modo sicuro le eccezioni di rete (`SocketTimeoutException`, `IOException`) e garantisce la chiusura del server.
+ * - Alla terminazione, interrompe tutti i thread figli creati per i client.
+ * - Consente di continuare l'ascolto fintanto che il thread principale non viene interrotto.
+ */
 
 public class SocketListener implements Runnable {
 
-    /* Rappresenta un listener per il server che gestisce connessioni Client
-    *  Ogni volta che un Client si connette viene creato un nuovo thread per gestirlo
-    */
     private ServerSocket server;
-    private LinkedList<Thread> children = new LinkedList<>();
+    private List<Thread> children = new LinkedList<>();
 
     public SocketListener(ServerSocket server) {
         this.server = server;

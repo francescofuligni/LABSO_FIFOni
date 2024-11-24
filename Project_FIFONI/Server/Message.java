@@ -1,12 +1,16 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-public class Message{
-
     /*
-     * Rappresentazione di un messaggio
-     * Il messaggio ha un id, il suo testo e la data e ora ricezione
+     * Classe `Message`:
+     * - Rappresenta un messaggio scambiato tra client e server.
+     * - Ogni messaggio ha un ID univoco, un testo e un timestamp che ne indica la data e l'ora di ricezione.
+     * - Il formato dell'ID è basato su un contatore, garantendo che ogni messaggio sia unico.
+     * - La data di ricezione viene automaticamente registrata al momento della creazione del messaggio.
+     * - (NB. sulla socket viene inviato solo il testo del messaggio, l'oggetto message viene creato solo quando viene invocato il metodo send)
+     * - La classe fornisce metodi per ottenere l'ID del messaggio e per formattare la data di ricezione in modo leggibile.
+     * 
      */
+public class Message{
 
     private String id;
     private String text;

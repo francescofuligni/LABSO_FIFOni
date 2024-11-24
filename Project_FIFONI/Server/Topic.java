@@ -1,12 +1,12 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Topic {
 
@@ -19,14 +19,14 @@ public class Topic {
     private Map<String, List<Message>> messages;
     private String name;
     private Set<ClientHandler> subscribers;
-    private int idCount;
+    private int IDcount;
     private int listCount;
 
     public Topic(String name) {
         this.name = name;
         this.messages = new HashMap<>();
-        this.subscribers = new HashSet<>();
-        this.idCount = 0;
+        this.subscribers = ConcurrentHashMap.newKeySet();
+        this.IDcount = 0;
         this.listCount = 0;
     }
 
@@ -39,12 +39,13 @@ public class Topic {
     // Restituisce TUTTI i messaggi sul topic NON in ORDINE 
     private List<Message> getAllMessages() {
         LinkedList<Message> allMessages = new LinkedList<>();
-    // Itera sulla mappa e aggiunge tutti i messaggi sulla lista aggregata
+        // Itera sulla mappa e aggiunge tutti i messaggi sulla lista aggregata
         for(String key : this.messages.keySet()) {
             allMessages.addAll(this.messages.get(key));
         }
         return allMessages;
     }
+
     // Trova un messaggio tramite il suo ID
     private Message findMessage(String messageID) {
         for(Message m : this.getAllMessages()) {
@@ -53,9 +54,9 @@ public class Topic {
         }
         return null;
     }
-    /* 
-    Notifica i Subscribers di un nuovo messaggio pubblicato sul Topic a cui sono iscritti
-    Invia il messaggio ai Subscribers tramite Socket 
+
+    /* Notifica i Subscribers di un nuovo messaggio pubblicato sul Topic a cui sono iscritti
+        Invia il messaggio ai Subscribers tramite Socket 
     */
     private void notifySubscribers(Message message) {
         for (ClientHandler c : this.subscribers) {
@@ -67,6 +68,7 @@ public class Topic {
             }
         }
     }
+    
     // Elimina un messaggio dal Topic usando il suo ID, trova il messaggio e lo rimuove dalla lista associata al Client che lo ha inviato
     private boolean deleteMessage(String messageID) {
         Message messageToRemove = findMessage(messageID);
@@ -84,6 +86,7 @@ public class Topic {
     private synchronized void startList() throws InterruptedException {
         listCount++;
     }
+
     /* Decrementa il contatore quando finiscono le operazioni di List o Listall
        Quando non c i sono più operazioni in corso notifica i thread in attesa
        */
@@ -93,16 +96,16 @@ public class Topic {
             notifyAll();
     }
 
-    
-    /*Permette a un publisher di aggiungere un messaggio con il proprio ID al topic 
-      Aggiunge il messaggio alla lista del Client o ne crea una nuova se il client non è presente
-      */
+    /*
+     * Permette a un publisher di aggiungere un messaggio con il proprio ID al topic 
+     * Aggiunge il messaggio alla lista del Client o ne crea una nuova se il client non è presente
+     */
     public synchronized void send(String clientID, String text) throws InterruptedException {
         while(listCount > 0) // Se ci sono operazioni List o Listall in corso aspetta 
             wait();
 
-        idCount++;
-        Message m = new Message(text, idCount);
+        IDcount++;
+        Message m = new Message(text, IDcount);
         if(this.messages.containsKey(clientID)) {
             this.messages.get(clientID).add(m);
         }
@@ -110,6 +113,7 @@ public class Topic {
             this.messages.put(clientID, new LinkedList<>());
             this.messages.get(clientID).add(m);
         }
+
         // Notifica i Subscribers al Topic del nuovo messaggio
         notifySubscribers(m);
         // Notifica i thread in attesa
@@ -117,18 +121,13 @@ public class Topic {
     }
 
     // Registra un subscriber al Topic
-    public synchronized void subscribe(ClientHandler c) {
+    public void subscribe(ClientHandler c) {
         this.subscribers.add(c);
     }
 
     // da invocare sul topic quando un client subscriber viene terminato
-    public synchronized void unscribe(ClientHandler c) {
+    public void unsubscribe(ClientHandler c) {
         this.subscribers.remove(c);
-    }
-
-    // Restituisce i subscribers registrati al Topic
-    public Set<ClientHandler> getSubscribers() {
-        return subscribers;
     }
 
     // Restituisce i messaggi inviati da un Client sul Topic

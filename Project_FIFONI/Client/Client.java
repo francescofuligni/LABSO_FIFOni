@@ -33,4 +33,35 @@ public class Client {
              * Delega la gestione di input/output a due thread separati, uno per inviare
              * messaggi e uno per leggerli
              */
-            Thread s
+            Thread sender = new Thread(new Sender(s));
+            Thread receiver = new Thread(new Receiver(s, sender));
+
+            sender.start();
+            receiver.start();
+
+            try {
+                /* 
+                 * Rimane in attesa che sender e receiver terminino la loro esecuzione
+                 */
+                sender.join();
+                receiver.join();
+                s.close();
+                System.out.println("Socket chiusa.");
+            } catch (InterruptedException e) {
+                /*
+                 * Se il thread principale viene interrotto durante l'attesa, esce immediatamente.
+                 * Non tenta di eseguire altre operazioni.
+                 */
+                return;
+            }
+            /*
+             * Gestisce eventuali errori relativi all'I/O durante la connessione al server
+             * o durante la creazione del socket.
+             * 
+             */
+        } catch (IOException e) {
+            System.err.println("CLIENT - IOException catturata: " + e);
+            e.printStackTrace();
+        }
+    }
+}

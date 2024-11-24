@@ -18,4 +18,25 @@ public class Message{
 
     public Message(String text, int id){
         this.id = "msg_" + id;  // Univoco nel topic
-        // this.id = "msg_" + System.currentTimeMillis(); 
+        // this.id = "msg_" + System.currentTimeMillis(); // Univoco globalmente
+        this.text = text;
+        this.date = LocalDateTime.now();
+    }
+
+    public String getID() {
+        return this.id;
+    }
+
+    // Formatta correttamente la data per la stampa
+    private String printDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm:ss.SSSSS");
+        return date.format(formatter);
+    }
+
+    @Override
+    public String toString() {
+        return  "ID: " + this.id +
+                "\n    Testo: '" + this.text +
+                "'\n    Data: " + printDate();
+    }
+}

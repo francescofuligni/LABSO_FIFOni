@@ -23,4 +23,48 @@ public class Sender implements Runnable {
     private Socket s;
     /*
      * Sender:
-     * Inizializza il socket tramite il quale il client invierà i messaggi al serv
+     * Inizializza il socket tramite il quale il client invierà i messaggi al server.
+     */
+    public Sender(Socket s) {
+        this.s = s;
+    }
+   /*
+     * Metodo `run`:
+     * Responsabile della gestione dell'input da tastiera dell'utente e dell'invio dei messaggi al server.
+     * 1. Legge l'input dell'utente da console.
+     * 2. Invia i messaggi al server attraverso il flusso di output del socket.
+     * 3. Rileva interruzioni del thread e invia un messaggio "quit" al server prima di terminare.
+     * 4. Gestisce il comando "quit" inserito dall'utente, terminando il ciclo di invio.
+     */
+    @Override
+    public void run() {
+        Scanner userInput = new Scanner(System.in);
+
+        try {
+            PrintWriter to = new PrintWriter(this.s.getOutputStream(), true);
+            while (true) {
+                String request = userInput.nextLine();
+                /*
+                 * se il thread è stato interrotto mentre leggevamo l'input da tastiera, inviamo
+                 * "quit" al server.
+                 */
+                if (Thread.interrupted()) {
+                    to.println("quit");
+                    break;
+                }
+                /* in caso contrario proseguiamo e analizziamo l'input inserito */
+                to.println(request);
+                if (request.equals("quit")) {
+                    break;
+                }
+            }
+            System.out.println("Sender terminato.");
+        } catch (IOException e) {
+            System.err.println("SENDER - IOException catturata: " + e);
+            e.printStackTrace();
+        } finally {
+            userInput.close();
+        }
+    }
+
+}

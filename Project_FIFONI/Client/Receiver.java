@@ -20,4 +20,49 @@ public class Receiver implements Runnable {
     private Thread sender;
 
     /*
-     * Inizializ
+     * Inizializza il socket di connessione al server e un riferimento al thread `sender`.
+     * Questo riferimento consente di interrompere il thread `sender` quando necessario.
+     */
+
+    public Receiver(Socket s, Thread sender) {
+        this.s = s;
+        this.sender = sender;
+    }
+
+    /*
+     * RUN: Responsabile della lettura dei messaggi provenienti dal server.
+     * 1. Utilizza uno scanner per leggere l'input dal socket riga per riga, finché possibile.
+     * 2. Stampa ogni messaggio ricevuto sulla console.
+     * 3. Al comando speciale `quit` interrompe l'esecuzione del thread.
+     * 4. In caso di errore o chiusura, garantisce che il thread `sender` venga interrotto.
+     *
+     * Blocco Try-catch:
+     * Gestisce eventuali errori di input/output durante la lettura dei dati dal server.
+     * Fornisce informazioni utili per il debug.
+     *
+     * Blocco Finally:
+     * Garantisce la terminazione del thread `sender` quando il Receiver viene chiuso.
+     */
+
+    @Override
+    public void run() {
+        try {
+
+            Scanner from = new Scanner(this.s.getInputStream());
+            while (true && from.hasNextLine()) {        
+                String response = from.nextLine();
+                System.out.println(response);
+                if (response.equals("quit")) {
+                    break;
+                }
+            }
+            from.close();
+        } catch (IOException e) {
+            System.err.println("RECEIVER - IOException caught: " + e);
+            e.printStackTrace();
+        } finally {
+            System.out.println("Receiver terminato.");
+            this.sender.interrupt();
+        }
+    }
+}

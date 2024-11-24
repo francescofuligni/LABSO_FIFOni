@@ -140,6 +140,7 @@ public class Topic {
 
     // Restituisce i messaggi inviati da un Client sul Topic
     public String list(String clientID) throws InterruptedException {
+
         startList(); // Segnala l'inizio dell'operazione List per gestire la concorrenza con send
 
         String print = "";
@@ -148,9 +149,11 @@ public class Topic {
             for(Message m : clientMessages) {
                 print += "\n  - " + m.toString();
             }
+            
             endList(); // Segnala la fine dell'operazione List per gestire la concorrenza con send
             return "Messaggi inviati dal client '" +  clientID + "' sul topic '" +  this.name + "':" + print;
         }
+
         endList(); // Segnala la fine dell'operazione List anche in caso di messaggi nulli per gestire la concorrenza con send
         return "Nessun messaggio inviato dal client '" + clientID + "' sul topic '" + this.name + "'.";
     }

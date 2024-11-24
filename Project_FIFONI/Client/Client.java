@@ -15,13 +15,6 @@ import java.net.Socket;
      */
 public class Client {
 
-    /*
-     * Il Main si occupa di:
-     * 1. Validare gli argomenti passati da linea di comando (host e porta).
-     * 2. Stabilire una connessione con il server tramite socket.
-     * 3. Creare e avviare due thread dedicati alla gestione dell'invio e della ricezione di messaggi.
-     * 4. Garantire una corretta chiusura della connessione al termine dell'esecuzione.
-     */
     public static void main(String[] args) {
         if (args.length < 2) {
             System.err.println("Utilizzo:\n> java Client <host> <porta>");
@@ -40,35 +33,4 @@ public class Client {
              * Delega la gestione di input/output a due thread separati, uno per inviare
              * messaggi e uno per leggerli
              */
-            Thread sender = new Thread(new Sender(s));
-            Thread receiver = new Thread(new Receiver(s, sender));
-
-            sender.start();
-            receiver.start();
-
-            try {
-                /* 
-                 * Rimane in attesa che sender e receiver terminino la loro esecuzione
-                 */
-                sender.join();
-                receiver.join();
-                s.close();
-                System.out.println("Socket chiusa.");
-            } catch (InterruptedException e) {
-                /*
-                 * Se il thread principale viene interrotto durante l'attesa, esce immediatamente.
-                 * Non tenta di eseguire altre operazioni.
-                 */
-                return;
-            }
-            /*
-             * Gestisce eventuali errori relativi all'I/O durante la connessione al server
-             * o durante la creazione del socket.
-             * 
-             */
-        } catch (IOException e) {
-            System.err.println("CLIENT - IOException catturata: " + e);
-            e.printStackTrace();
-        }
-    }
-}
+            Thread s

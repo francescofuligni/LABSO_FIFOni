@@ -52,26 +52,4 @@ public class TopicsHandler {
     // Verifica se un Topic esiste nella mappa ed utilizza il contatore readCount per gestire la concorrenza
     public boolean contains(String topicName) throws InterruptedException {
         startRead();
-        boolean flag = this.topics.containsKey(topicName);
-        endRead();
-        return flag;
-    }
-
-    /* Restituisce l'elenco di tutti i Topic, supporta la lettura concorrente e 
-    gestisce la concorrenza con la creazione di nuovi topic
-    */
-    public String show() throws InterruptedException {
-        startRead();
-
-        String print = "";
-        if(!topics.isEmpty()) {
-            for(String t : this.topics.keySet()) {
-                print += "\n  - " + t;
-            }
-            endRead();
-            return "Tutti i topic:" + print;
-        }
-        endRead();
-        return "Nessun topic creato.";
-    }
-}
+        boolean flag = this

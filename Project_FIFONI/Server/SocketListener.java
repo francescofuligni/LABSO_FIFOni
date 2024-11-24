@@ -34,7 +34,6 @@ public class SocketListener implements Runnable {
             while (!Thread.interrupted()) {
                 try {
                     
-
                     /*
                      * Questa istruzione è bloccante, a prescindere da Thread.interrupt(). Occorre
                      * quindi controllare, una volta accettata la connessione, che il server non sia
@@ -80,12 +79,8 @@ public class SocketListener implements Runnable {
         System.out.println("Interrompendo i vari children...");
         for (Thread child : this.children) {
             System.out.println("Interrompendo " + child + "...");
-            /*
-             * child.interrupt() non è bloccante; una volta inviato il segnale
-             * di interruzione proseguiamo con l'esecuzione, senza aspettare che "child"
-             * termini
-             */
-            child.interrupt();
+            
+            child.interrupt(); //non è bloccante;
         }
 
     }

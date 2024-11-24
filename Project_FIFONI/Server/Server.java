@@ -62,7 +62,7 @@ public class Server {
                         break;
                 
                     default:
-                        System.out.println("Comando <" +  command + "> sconosciuto.");
+                        System.out.println("Comando <" +  parts[0] + "> sconosciuto.");
                         break;
                 }
             }

@@ -1,13 +1,23 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Scanner;
-
+/*
+ * Classe `Server`:
+ * - Punto di ingresso per un server socket che gestisce connessioni client e topic.
+ * - La porta viene specificata come argomento all'avvio.
+ * - Gestione concorrente delle connessioni tramite un thread dedicato (`SocketListener`).
+ * - Interfaccia interattiva per l'amministrazione con comandi:
+ *   - `show`: Mostra i topic attivi.
+ *   - `inspect <topic>`: Analizza un topic specifico.
+ *   - `quit`: Termina il server.
+ * - Gestisce eccezioni di rete (`IOException`) e interruzioni dei thread (`InterruptedException`).
+ * - Garantisce chiusura ordinata delle risorse al termine.
+ */
 public class Server {
     
     public static TopicsHandler topics = new TopicsHandler();
 
-    // Verifica che sia stata passata una porta come argomento e se non è cosi termina l'esecuzione
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("Utilizzo: java Server <porta>");
             return;
@@ -29,7 +39,7 @@ public class Server {
             System.out.println("Comandi server:\n  > show\n  > inspect <topic>\n  > quit");
 
             boolean closed = false;
-            // Legge un comando dalla console dividendo il comando e i parametri
+            
             while (!closed) {
                 command = input.nextLine().trim();
                 String[] parts = command.split(" ", 2);

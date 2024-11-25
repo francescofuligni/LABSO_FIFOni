@@ -7,14 +7,22 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+/*
+ * Classe `Topic`:
+ * - Gestisce un argomento di discussione identificato da un nome.
+ * - Mantiene una mappa di messaggi inviati dai client (`<ClientID, List<Message>>`) e un insieme di subscriber per notifiche.
+ * - Funzionalità principali:
+ *   - Invio di messaggi da parte dei client e notifica automatica ai subscriber.
+ *   - Elenco di messaggi per client (`list`) o globali (`listAll`).
+ *   - Eliminazione di messaggi tramite ID.
+ *   - Sessione interattiva per amministratori per visualizzare o eliminare messaggi.
+ * - Consente di iscrivere o rimuovere subscriber.
+ * - Fornisce metodi per recuperare o gestire messaggi in base al client o all'ID.
+ */
 
 public class Topic {
 
-    /*
-     * Rappresenta un topic.
-     * Il topic ha un nome e una lista di messaggi associata.
-     */
-
+ 
     // <Client ID, LinkedList di messaggi> traccia i messaggi inviati da ciascun client
     private Map<String, List<Message>> messages;
     private String name;
@@ -132,6 +140,7 @@ public class Topic {
 
     // Restituisce i messaggi inviati da un Client sul Topic
     public String list(String clientID) throws InterruptedException {
+
         startList(); // Segnala l'inizio dell'operazione List per gestire la concorrenza con send
 
         String print = "";
@@ -140,9 +149,11 @@ public class Topic {
             for(Message m : clientMessages) {
                 print += "\n  - " + m.toString();
             }
+            
             endList(); // Segnala la fine dell'operazione List per gestire la concorrenza con send
             return "Messaggi inviati dal client '" +  clientID + "' sul topic '" +  this.name + "':" + print;
         }
+
         endList(); // Segnala la fine dell'operazione List anche in caso di messaggi nulli per gestire la concorrenza con send
         return "Nessun messaggio inviato dal client '" + clientID + "' sul topic '" + this.name + "'.";
     }

@@ -1,15 +1,21 @@
 import java.util.HashMap;
+import java.util.Map;
+/*
+ * Classe `TopicsHandler`:
+ * - Gestisce un insieme di topic attraverso una mappa (`HashMap`) in cui la chiave è il nome del topic e il valore è l'oggetto `Topic` associato.
+ * - Supporta la gestione concorrente tra operazioni di lettura (es. `show`, `contains`) e scrittura (es. `putIfAbsent`) utilizzando un contatore (`readCount`) e sincronizzazione.
+ * - Metodi principali:
+ *   - `get(String topicName)`: Restituisce un topic dato il suo nome.
+ *   - `putIfAbsent(String topicName)`: Aggiunge un topic se non esiste già, gestendo la concorrenza con i lettori.
+ *   - `contains(String topicName)`: Verifica l'esistenza di un topic in modo concorrente.
+ *   - `show()`: Restituisce l'elenco di tutti i topic attivi in modo sicuro e leggibile.
+ * 
+ */
 
 public class TopicsHandler {
 
-    /*
-        Gestisce un insieme di Topic rappresentati da un Hashmap dove la chiave è il nome del topic
-        e il valore è l'oggetto del Topic associato
-
-
-
-    */
-    private HashMap<String,Topic> topics;
+  
+    private Map<String,Topic> topics;
     private int readCount; // Contatore di lettori attivi per gestire la concorrenza
 
     public TopicsHandler() {

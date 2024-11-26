@@ -180,6 +180,9 @@ public class Topic {
        permette di vedere tutti i messaggi ed eventualmente eliminarli 
     */
     public synchronized void interactiveSession(Scanner input) throws InterruptedException {
+        while(listCount > 0) // Se ci sono operazioni List o Listall in corso aspetta 
+            wait();
+
         System.out.println("\n* SESSIONE INTERATTIVA AVVIATA *\nComandi sessione interattiva:\n  > :listall\n  > :delete <id>\n  > :end");
         
         boolean closed = false;
@@ -225,6 +228,7 @@ public class Topic {
             }
         }
         System.out.println("* SESSIONE INTERATTIVA TERMINATA *\n");
+        notifyAll();
     }
 
     

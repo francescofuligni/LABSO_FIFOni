@@ -41,11 +41,11 @@ public class TopicsHandler {
     }
 
     // Aggiunge un nuovo topic se non esiste già, blocca i writer concorrenti e gestisce la concorrenza con show
-    public synchronized void putIfAbsent(String topicName) throws InterruptedException {
+    public synchronized void put(String topicName) throws InterruptedException {
         while(readCount > 0)
             wait();
         
-        topics.putIfAbsent(topicName, new Topic(topicName));
+        topics.put(topicName, new Topic(topicName));
         notifyAll();
     }
 

@@ -95,7 +95,9 @@ public class ClientHandler implements Runnable {
                                     topicName = parts[1].trim();
                                     role = Role.publisher;
                                     
-                                    Server.topics.putIfAbsent(topicName);
+                                    if(!Server.topics.contains(topicName))
+                                        Server.topics.put(topicName);
+                                    
                                     toClient.println("Registrato come " + role + " sul topic '" + topicName + 
                                     "'.\nComandi " + role + ":\n  > send <message>\n  > list\n  > listall\n  > quit");
                                 } else {
@@ -113,7 +115,8 @@ public class ClientHandler implements Runnable {
                                     topicName = parts[1].trim();
                                     role = Role.subscriber;
 
-                                    Server.topics.putIfAbsent(topicName);
+                                    if(!Server.topics.contains(topicName))
+                                        Server.topics.put(topicName);
                                     Server.topics.get(topicName).subscribe(this);
                                     
                                     toClient.println("Registrato come " + role + " al topic '" + topicName + 

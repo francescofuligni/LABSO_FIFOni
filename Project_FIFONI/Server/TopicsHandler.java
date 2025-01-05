@@ -28,16 +28,19 @@ public class TopicsHandler {
         readCount++;
     }
 
-     // Indica la fine di una lettura per gestire la concorrenza tra la creazione di un nuovo Topic e show
+    // Indica la fine di una lettura per gestire la concorrenza tra la creazione di un nuovo Topic e show
     private synchronized void endRead() {
         readCount--;
         if(readCount == 0) // Quando non ci sono operazioni di lettura notifica eventuali thread in attesa
             notifyAll();
     }
     
-
-    public Topic get(String topicName) {
-        return this.topics.get(topicName);
+    // Restituisce il topic con nome topicName
+    public Topic get(String topicName) throws InterruptedException {
+        startRead();
+        Topic t = this.topics.get(topicName);
+        endRead();
+        return t;
     }
 
     // Aggiunge un nuovo topic se non esiste già, blocca i writer concorrenti e gestisce la concorrenza con show
@@ -58,8 +61,8 @@ public class TopicsHandler {
     }
 
     /* Restituisce l'elenco di tutti i Topic, supporta la lettura concorrente e 
-    gestisce la concorrenza con la creazione di nuovi topic
-    */
+     * gestisce la concorrenza con la creazione di nuovi topic
+     */
     public String show() throws InterruptedException {
         startRead();
 

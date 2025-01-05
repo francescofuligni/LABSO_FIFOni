@@ -36,8 +36,11 @@ public class TopicsHandler {
     }
     
 
-    public Topic get(String topicName) {
-        return this.topics.get(topicName);
+    public Topic get(String topicName) throws InterruptedException {
+        startRead();
+        Topic t = this.topics.get(topicName);
+        endRead();
+        return t;
     }
 
     // Aggiunge un nuovo topic se non esiste già, blocca i writer concorrenti e gestisce la concorrenza con show

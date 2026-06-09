@@ -1,4 +1,4 @@
-# Operating Systems Course Project -- FIFOni Group
+# Operating Systems Course Project - FIFOni Group
 
 Repository containing the client-server application developed for the Operating Systems laboratory project, as part of the Bachelor's Degree in Informatics for Management at the University of Bologna, 2024.
 
